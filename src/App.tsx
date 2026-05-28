@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthLayout from '@/components/layouts/auth-layout';
 import AdminLayout from '@/components/layouts/admin-layout';
+import OwnerLayout from '@/components/layouts/owner-layout';
 import { ErrorBoundary } from './components/shared/error-boundary';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import { lazy, Suspense } from 'react';
@@ -29,6 +30,9 @@ const AdminNotifications = lazy(
   () => import('@/pages/admin/notifications/index'),
 );
 const AdminAuditLogs = lazy(() => import('@/pages/admin/audit-logs/index'));
+
+// ── Owner pages ──────────────────────────────────────────────────────────────
+const OwnerBoats = lazy(() => import('@/pages/owner/boats/index'));
 
 function PageLoader() {
   return <LoadingSpinner fullScreen />;
@@ -159,6 +163,25 @@ function App() {
                         <AdminAuditLogs />
                       </Suspense>
                     }
+                  />
+                </Route>
+              </Route>
+
+              {/* Owner pages — role-gated */}
+              <Route element={<ProtectedRoute roles={['owner']} />}>
+                <Route element={<OwnerLayout />}>
+                  <Route
+                    path={routeName.ownerBoats}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <OwnerBoats />
+                      </Suspense>
+                    }
+                  />
+                  {/* Default fallback for owner to boats for now */}
+                  <Route
+                    path={routeName.owner}
+                    element={<Navigate to={routeName.ownerBoats} replace />}
                   />
                 </Route>
               </Route>

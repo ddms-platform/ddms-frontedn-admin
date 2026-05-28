@@ -764,7 +764,7 @@ function BoatFormModal({ editBoat, onClose, onSave }: { editBoat?: Boat; onClose
 }
 
 /* ═══════════════════ MAIN PAGE ═══════════════════ */
-export default function AdminBoats() {
+export default function OwnerBoats() {
   const [boats, setBoats] = useState<Boat[]>(MOCK_BOATS);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<BoatStatus | 'all'>('all');
