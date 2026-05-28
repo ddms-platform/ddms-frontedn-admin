@@ -1,0 +1,693 @@
+{
+  "auth": {
+    "signIn": {
+      "title": "Welcome back",
+      "description": "Sign in to your account to continue",
+      "email": "Email address",
+      "emailPlaceholder": "name@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "signIn": "Sign in",
+      "signingIn": "Signing in...",
+      "orContinueWith": "or continue with",
+      "dontHaveAccount": "Don't have an account",
+      "signUpLink": "Sign up"
+    },
+    "signUp": {
+      "title": "Create your account",
+      "description": "Start your journey with DDMS today",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "John Doe",
+      "email": "Email address",
+      "emailPlaceholder": "name@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Create a password",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "orSignUpWithEmail": "or sign up with email",
+      "agreeToTerms": "I agree to the",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "createAccount": "Create account",
+      "creatingAccount": "Creating account...",
+      "alreadyHaveAccount": "Already have an account",
+      "signInLink": "Sign in"
+    },
+    "layout": {
+      "welcomeTitle": "Welcome to DDMS",
+      "welcomeDescription": "A management system and support platform for booking waterway tours in Da Nang city. Enjoy a wonderful river experience with just a few simple steps.",
+      "feature1": "Easy waterway tour management",
+      "feature2": "Schedule & track trips in realtime",
+      "feature3": "Discover the beauty of Han River, Da Nang"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to DDMS Dashboard",
+    "tabs": {
+      "all": "All trips",
+      "upcoming": "Upcoming",
+      "completed": "Completed"
+    },
+    "status": {
+      "UPCOMING": "Upcoming",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "bookingRef": "Booking ID",
+    "guests": "guest(s)",
+    "cancelBooking": "Cancel booking",
+    "writeReview": "Write review",
+    "viewDetails": "View details",
+    "emptyTitle": "No trips booked... yet!",
+    "emptyDescription": "Time to dust off your bags and start planning your next adventure.",
+    "exploreBtn": "Start searching"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "tryAgain": "Try Again",
+    "somethingWentWrong": "Something went wrong",
+    "unexpectedError": "An unexpected error occurred"
+  },
+  "validation": {
+    "required": "{{field}} is required",
+    "invalidEmail": "Please enter a valid email address",
+    "minLength": "Must be at least {{count}} characters",
+    "termsRequired": "You must agree to the terms and conditions"
+  },
+  "becomeOwner": {
+    "navLink": "Become an owner",
+    "hero": {
+      "eyebrow": "DDMS for boat owners",
+      "title": "Grow your waterway tour business",
+      "description": "Bring your boats, tours, schedules, and guest bookings into one operating flow built for Da Nang waterway tourism.",
+      "primaryCta": "Register as an owner",
+      "secondaryCta": "Explore tours"
+    },
+    "benefits": {
+      "title": "Run daily operations from one place",
+      "subtitle": "DDMS gives boat owners a focused workspace for tour listings, departure schedules, and customer demand.",
+      "items": {
+        "manageTours": {
+          "title": "Manage tours",
+          "description": "Create tour listings, update pricing, organize photos, and keep public information ready for booking."
+        },
+        "scheduleBoats": {
+          "title": "Schedule boats",
+          "description": "Attach boats to upcoming departures, track availability, and avoid overlapping operating slots."
+        },
+        "receiveBookings": {
+          "title": "Receive bookings",
+          "description": "View guest reservations, booking status, guest counts, add-ons, and trip notes in one queue."
+        }
+      }
+    },
+    "process": {
+      "title": "A clear path to publish your first tour",
+      "subtitle": "The owner flow is designed around verification first, then reliable tour operations.",
+      "steps": {
+        "profile": {
+          "title": "Create your owner profile",
+          "description": "Add your business name, operating address, and contact information for guest support."
+        },
+        "verify": {
+          "title": "Verify your license",
+          "description": "Submit license details so the platform can review your eligibility before opening bookings."
+        },
+        "publish": {
+          "title": "Publish tours",
+          "description": "Add boats, create tours, set departure schedules, and start receiving reservations."
+        }
+      }
+    },
+    "requirements": {
+      "title": "What you need to prepare",
+      "subtitle": "These details help the platform verify your business and keep trip information accurate for travelers.",
+      "cta": "Start registration",
+      "items": {
+        "license": {
+          "title": "Business or operating license",
+          "description": "Prepare your license number and a clear image of the document for review."
+        },
+        "boatInfo": {
+          "title": "Boat information",
+          "description": "Have boat names, types, passenger capacity, images, cabins, and onboard services ready."
+        },
+        "contact": {
+          "title": "Operating contact",
+          "description": "Provide a business phone number and support address for booking coordination."
+        }
+      }
+    }
+  },
+  "ownerDashboard": {
+    "eyebrow": "Owner workspace",
+    "title": "Today’s operating dashboard",
+    "description": "Track departures, boat readiness, booking queues, and issues that need attention before guests arrive at the dock.",
+    "actions": {
+      "createTour": "Create tour",
+      "viewSchedule": "View schedule"
+    },
+    "metrics": {
+      "todayBookings": {
+        "label": "Bookings today",
+        "helper": "Confirmed and pending reservations for today’s trips."
+      },
+      "todayRevenue": {
+        "label": "Revenue today",
+        "helper": "Paid bookings from schedules departing today."
+      },
+      "departures": {
+        "label": "Departures",
+        "helper": "Scheduled, boarding, and ongoing trips."
+      },
+      "readyBoats": {
+        "label": "Ready boats",
+        "helper": "Boats available outside maintenance windows."
+      }
+    },
+    "departures": {
+      "title": "Today’s departures",
+      "subtitle": "Monitor capacity, dock assignment, and trip status.",
+      "guests": "guests booked"
+    },
+    "fleet": {
+      "title": "Fleet status",
+      "subtitle": "Quick view of boats and upcoming assignments.",
+      "next": "Next"
+    },
+    "bookings": {
+      "title": "Booking queue",
+      "subtitle": "Recent reservations that need owner visibility.",
+      "guests": "guests"
+    },
+    "readiness": {
+      "title": "Operational readiness",
+      "subtitle": "Items to check before opening more capacity.",
+      "review": "Review schedules",
+      "items": {
+        "profile": {
+          "title": "Owner profile verified",
+          "description": "Business information and operating contact are ready."
+        },
+        "boats": {
+          "title": "Core fleet configured",
+          "description": "Boat capacity, images, cabins, and services are available."
+        },
+        "maintenance": {
+          "title": "Maintenance windows pending",
+          "description": "One boat still needs a maintenance window confirmed."
+        },
+        "capacity": {
+          "title": "Capacity review needed",
+          "description": "Weekend trips are close to full and may need another boat."
+        }
+      }
+    },
+    "status": {
+      "schedule": {
+        "boarding": "Boarding",
+        "scheduled": "Scheduled",
+        "attention": "Needs check"
+      },
+      "booking": {
+        "pending": "Pending payment",
+        "paid": "Paid",
+        "review": "Review"
+      },
+      "boat": {
+        "running": "Running",
+        "idle": "Idle",
+        "maintenance": "Maintenance"
+      }
+    }
+  },
+  "home": {
+    "nav": {
+      "tours": "Tours",
+      "howItWorks": "How It Works",
+      "destinations": "Destinations",
+      "signIn": "Sign In"
+    },
+    "hero": {
+      "title": "Discover Da Nang's Waterway Beauty",
+      "description": "Book river cruises on the Han River, watch the Dragon Bridge breathe fire, and enjoy an unforgettable waterway journey.",
+      "searchPlaceholder": "Search tours, destinations...",
+      "searchButton": "Search",
+      "stat1": "Trips",
+      "stat2": "Customers",
+      "stat3": "Rating"
+    },
+    "categories": {
+      "cruise": "Cruise",
+      "sunset": "Sunset",
+      "party": "Boat Party",
+      "family": "Family",
+      "sightseeing": "Sightseeing",
+      "dinner": "Dinner"
+    },
+    "tours": {
+      "title": "Featured Tours",
+      "subtitle": "The most loved waterway experiences in Da Nang",
+      "viewAll": "View all",
+      "reviews": "reviews",
+      "perPerson": "person"
+    },
+    "howItWorks": {
+      "title": "Book in 4 Easy Steps",
+      "subtitle": "Simple, fast, and reliable",
+      "stepLabel": "Step {{step}}",
+      "step1Title": "Search",
+      "step1Desc": "Explore waterway tours by location, price, or departure date.",
+      "step2Title": "Schedule",
+      "step2Desc": "Pick a date, time, and number of passengers that suits you.",
+      "step3Title": "Board",
+      "step3Desc": "Arrive at the dock and begin your amazing river journey.",
+      "step4Title": "Review",
+      "step4Desc": "Share your experience to help other travelers."
+    },
+    "destinations": {
+      "title": "Popular Destinations",
+      "hanRiver": "Han River",
+      "marbleMountains": "Marble Mountains",
+      "bachDang": "Bach Dang Wharf",
+      "toursAvailable": "tours available"
+    },
+    "cta": {
+      "title": "Ready for a River Adventure?",
+      "description": "Sign up today and get a special offer on your first tour booking.",
+      "signUp": "Sign Up Free",
+      "explore": "Explore Tours"
+    },
+    "footer": {
+      "description": "Waterway tour booking and management platform in Da Nang city.",
+      "rights": "All rights reserved.",
+      "madeIn": "Made with ❤️ in Da Nang",
+      "explore": {
+        "title": "Explore",
+        "link1": "River Cruises",
+        "link2": "Sunset Tours",
+        "link3": "Family Tours"
+      },
+      "support": {
+        "title": "Support",
+        "link1": "Help Center",
+        "link2": "Contact Us",
+        "link3": "FAQs"
+      },
+      "legal": {
+        "title": "Legal",
+        "link1": "Terms of Service",
+        "link2": "Privacy Policy",
+        "link3": "Cancellation Policy"
+      }
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "uploadAvatar": "Change avatar",
+    "personalInfo": "Personal Information",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email address",
+      "phone": "Phone number",
+      "address": "Address"
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "description": "Keep your account secure",
+      "change": "Change password",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "update": "Update password",
+      "errors": {
+        "currentRequired": "Please enter your current password",
+        "newRequired": "Please enter a new password",
+        "minLength": "Password must be at least 6 characters",
+        "mismatch": "Passwords do not match"
+      }
+    }
+  },
+  "tour": {
+    "backToHome": "Back to home",
+    "gallery": {
+      "photo": "Photo"
+    },
+    "info": {
+      "duration": "Duration",
+      "maxGuests": "Max guests",
+      "people": "people",
+      "boat": "Boat",
+      "about": "About this tour"
+    },
+    "reviews": {
+      "title": "reviews"
+    },
+    "booking": {
+      "perPerson": "person",
+      "availability": "Availability",
+      "available": "Available",
+      "cancellation": "Cancellation",
+      "freeCancellation": "Free cancellation",
+      "bookNow": "Book Now",
+      "addWishlist": "Add to wishlist",
+      "noChargeYet": "You won't be charged yet"
+    }
+  },
+  "booking": {
+    "title": "Book Tour",
+    "backToTour": "Back to tour details",
+    "next": "Next",
+    "back": "Back",
+    "steps": {
+      "date": "Date & Time",
+      "boat": "Select Boat",
+      "rooms": "View Rooms",
+      "guests": "Guests",
+      "confirm": "Confirm"
+    },
+    "boat": {
+      "title": "Select a boat",
+      "subtitle": "Choose a boat for your trip. Some boats may be unavailable.",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "capacity": "Capacity",
+      "types": {
+        "cruise": "Cruise",
+        "luxury": "Luxury",
+        "standard": "Standard",
+        "party": "Party",
+        "speedboat": "Speedboat"
+      }
+    },
+    "dateTime": {
+      "title": "Select date and time",
+      "subtitle": "Choose a date and time slot that works for you",
+      "selectDate": "Select a date",
+      "selectTime": "Select departure time"
+    },
+    "guests": {
+      "title": "Number of guests",
+      "subtitle": "Maximum {{max}} guests per trip",
+      "people": "people"
+    },
+    "confirm": {
+      "title": "Confirm your booking",
+      "subtitle": "Review your details before payment",
+      "pay": "Pay & Confirm",
+      "processing": "Processing..."
+    },
+    "rooms": {
+      "title": "View rooms & cabins",
+      "subtitle": "Rooms available on {{boat}}. You may select a room or skip.",
+      "selected": "Selected",
+      "viewDetail": "View details",
+      "amenitiesLabel": "Amenities",
+      "ratingOverview": "Rating overview",
+      "reviewsLabel": "Guest reviews",
+      "closeModal": "Close",
+      "selectRoom": "Select this room",
+      "unselectRoom": "Unselect"
+    },
+    "summary": {
+      "tour": "Tour",
+      "date": "Date",
+      "time": "Time",
+      "guests": "Guests",
+      "boat": "Boat",
+      "room": "Room",
+      "total": "Total"
+    },
+    "success": {
+      "title": "Booking Confirmed!",
+      "description": "Thank you for your booking. We'll send a confirmation email to you.",
+      "viewBookings": "View my bookings",
+      "backHome": "Back to home"
+    }
+  },
+  "tourList": {
+    "title": "Explore Tours",
+    "subtitle": "Found {{count}} cruise trips",
+    "searchPlaceholder": "Search tours, locations...",
+    "filters": "Filters",
+    "reviews": "reviews",
+    "perPerson": "person",
+    "categories": {
+      "all": "All",
+      "cruise": "Cruise",
+      "sunset": "Sunset",
+      "party": "Party",
+      "family": "Family",
+      "sightseeing": "Sightseeing",
+      "dinner": "Dinner"
+    },
+    "sort": {
+      "rating": "Highest rated",
+      "priceAsc": "Price: low → high",
+      "priceDesc": "Price: high → low"
+    },
+    "empty": {
+      "title": "No tours found",
+      "description": "Try changing your search or filters to find a matching trip.",
+      "reset": "Clear filters"
+    }
+  },
+  "boatDetail": {
+    "viewDetails": "View details",
+    "notFound": "Boat not found",
+    "notFoundDesc": "The boat you're looking for doesn't exist or has been removed.",
+    "backToTours": "Back to tours",
+    "about": "About this boat",
+    "amenities": "Amenities & Facilities",
+    "schedule": "Operating Schedule",
+    "captain": "Captain",
+    "safety": "Safety Certified",
+    "safetyDesc": "Meets all maritime safety standards",
+    "trips": "trips",
+    "totalTrips": "Total trips",
+    "rating": "Rating",
+    "bookWithBoat": "Book a tour with this boat",
+    "viewRooms": "View rooms & cabins",
+    "currentlyUnavailable": "Currently unavailable",
+    "specs": {
+      "capacity": "Capacity",
+      "speed": "Max Speed",
+      "length": "Length",
+      "yearBuilt": "Year Built"
+    }
+  },
+  "rooms": {
+    "title": "Rooms & Cabins",
+    "subtitle": "{{count}} rooms available on this boat",
+    "searchPlaceholder": "Search rooms...",
+    "available": "available",
+    "soldOut": "Sold out",
+    "reviews": "reviews",
+    "perNight": "night",
+    "adults": "adults",
+    "children": "children",
+    "showReviews": "Reviews",
+    "bookRoom": "Book this room",
+    "found": "{{count}} rooms match your search",
+    "roomsMatch": "rooms match",
+    "steps": {
+      "guests": "Guests",
+      "selectRoom": "Select Room",
+      "guestsTitle": "How many guests?",
+      "guestsSubtitle": "Tell us who's coming so we can find the right room.",
+      "selectRoomTitle": "Choose your room",
+      "selectRoomSubtitle": "Showing rooms for {{rooms}} room(s), {{adults}} adult(s), {{children}} child(ren)",
+      "viewRooms": "View available rooms"
+    },
+    "filter": {
+      "rooms": "Rooms",
+      "adults": "Adults",
+      "children": "Children",
+      "sortBy": "Sort by"
+    },
+    "sort": {
+      "rating": "Highest rated",
+      "priceAsc": "Price: low → high",
+      "priceDesc": "Price: high → low"
+    },
+    "empty": {
+      "title": "No rooms found",
+      "description": "Try adjusting your filters to find available rooms.",
+      "reset": "Clear filters"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "tours": "Tours"
+  },
+  "header": {
+    "user": {
+      "ownerDashboard": "Owner Dashboard",
+      "profile": "My Profile",
+      "myTours": "My Tours",
+      "logout": "Sign out"
+    }
+  },
+  "ownerLayout": {
+    "brand": "OWNER",
+    "nav": {
+      "dashboard": "Dashboard",
+      "boats": "Boat Management",
+      "tours": "Tour Management",
+      "bookings": "Bookings",
+      "profile": "Business Profile"
+    },
+    "backHome": "Back to home",
+    "logout": "Sign out",
+    "collapse": "Collapse",
+    "role": "Boat Owner"
+  },
+  "ownerDash": {
+    "title": "Dashboard",
+    "subtitle": "Business operations overview",
+    "stats": {
+      "totalBoats": "Total Boats",
+      "activeTours": "Active Tours",
+      "monthlyBookings": "Monthly Bookings",
+      "monthlyRevenue": "Monthly Revenue"
+    },
+    "quickStart": "Quick Start",
+    "links": {
+      "boats": "Manage boats",
+      "boatsDesc": "View and manage your fleet",
+      "tours": "Manage tours",
+      "toursDesc": "Create and edit tours",
+      "bookings": "View bookings",
+      "bookingsDesc": "Track reservations"
+    }
+  },
+  "ownerBoats": {
+    "title": "Boat Management",
+    "subtitle": "Manage your entire fleet",
+    "addBoat": "Add new boat",
+    "stats": {
+      "total": "Total Boats",
+      "running": "Running",
+      "idle": "Idle",
+      "revenue": "Total Revenue"
+    },
+    "search": "Search boats...",
+    "filter": {
+      "all": "All",
+      "running": "Running",
+      "idle": "Idle",
+      "allTypes": "All types"
+    },
+    "view": {
+      "grid": "Grid",
+      "table": "Table"
+    },
+    "empty": {
+      "title": "No boats found",
+      "filtered": "Try changing your filters or search keyword",
+      "noBoats": "Get started by adding your first boat"
+    },
+    "card": {
+      "revenue": "revenue",
+      "guests": "Guests",
+      "rooms": "Rooms",
+      "services": "Svc",
+      "tours": "Tours",
+      "edit": "Edit",
+      "viewPublic": "View public page",
+      "delete": "Delete boat",
+      "maintenance": "Maintenance"
+    },
+    "table": {
+      "boat": "Boat",
+      "type": "Type",
+      "status": "Status",
+      "capacity": "Capacity",
+      "rooms": "Rooms",
+      "services": "Services",
+      "tours": "Tours",
+      "revenue": "Revenue",
+      "actions": "Actions"
+    },
+    "delete": {
+      "title": "Delete \"{{name}}\"?",
+      "description": "This action cannot be undone. All related data (rooms, services, images) will be permanently deleted.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "status": {
+      "running": "Running",
+      "idle": "Idle"
+    },
+    "types": {
+      "cruise": "Cruise",
+      "standard": "Standard",
+      "luxury": "Luxury",
+      "party": "Party boat",
+      "speedboat": "Speedboat"
+    },
+    "form": {
+      "createTitle": "Add new boat",
+      "editTitle": "Edit: {{name}}",
+      "createSubtitle": "Fill in information for the new boat",
+      "editSubtitle": "Update boat information",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "tabs": {
+        "basic": "Basic Info",
+        "cabins": "Cabins",
+        "services": "Services",
+        "images": "Images",
+        "maintenance": "Maintenance"
+      },
+      "basic": {
+        "title": "Basic Information",
+        "name": "Boat name",
+        "namePlaceholder": "e.g. Golden Dragon",
+        "type": "Boat type",
+        "capacity": "Max capacity (people)",
+        "capacityPlaceholder": "e.g. 40"
+      },
+      "cabins": {
+        "count": "{{count}} room(s) / cabin(s)",
+        "add": "Add room",
+        "empty": "No rooms yet. Add your first room!",
+        "label": "Room #{{index}}",
+        "name": "Room name",
+        "capacity": "Capacity",
+        "price": "Price (VND)",
+        "totalRooms": "Total rooms"
+      },
+      "services": {
+        "count": "{{count}} service(s)",
+        "add": "Add service",
+        "empty": "No services yet.",
+        "name": "Service name",
+        "price": "Price (VND)",
+        "active": "Active"
+      },
+      "images": {
+        "title": "Boat images",
+        "add": "Add photo",
+        "dragDrop": "Drag & drop or click to upload",
+        "select": "Select photos"
+      },
+      "maintenance": {
+        "title": "Maintenance schedule",
+        "add": "Add schedule",
+        "empty": "No maintenance scheduled.",
+        "default": "Maintenance"
+      }
+    }
+  }
+}

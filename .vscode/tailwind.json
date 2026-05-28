@@ -1,0 +1,27 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@tailwind",
+      "description": "Insert Tailwind's base, components, utilities styles."
+    },
+    {
+      "name": "@apply",
+      "description": "Inline existing utility classes into custom CSS."
+    },
+    {
+      "name": "@layer",
+      "description": "Tell Tailwind which bucket custom styles belong to."
+    },
+    {
+      "name": "@config",
+      "description": "Specify which config file Tailwind should use."
+    },
+    { "name": "@theme", "description": "Define custom theme values." },
+    { "name": "@source", "description": "Specify additional content sources." },
+    { "name": "@utility", "description": "Define custom utility classes." },
+    { "name": "@variant", "description": "Define custom variants." },
+    { "name": "@plugin", "description": "Load a Tailwind CSS plugin." },
+    { "name": "@import", "description": "Import other CSS files." }
+  ]
+}

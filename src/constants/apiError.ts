@@ -1,0 +1,4 @@
+export enum ApiErrorConstant {
+  USER_DISABLED = 'USER_DISABLED',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+}

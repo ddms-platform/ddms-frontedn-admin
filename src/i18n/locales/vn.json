@@ -1,0 +1,693 @@
+{
+  "auth": {
+    "signIn": {
+      "title": "Chào mừng trở lại",
+      "description": "Đăng nhập vào tài khoản của bạn để tiếp tục",
+      "email": "Địa chỉ email",
+      "emailPlaceholder": "Nhập email của bạn",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu của bạn",
+      "forgotPassword": "Quên mật khẩu?",
+      "signIn": "Đăng nhập",
+      "signingIn": "Đang đăng nhập...",
+      "orContinueWith": "hoặc tiếp tục với",
+      "dontHaveAccount": "Chưa có tài khoản",
+      "signUpLink": "Đăng ký"
+    },
+    "signUp": {
+      "title": "Tạo tài khoản",
+      "description": "Bắt đầu hành trình với DDMS ngay hôm nay",
+      "fullName": "Họ và tên",
+      "fullNamePlaceholder": "Nhập họ và tên",
+      "email": "Địa chỉ email",
+      "emailPlaceholder": "Nhập địa chỉ email",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+      "passwordsDoNotMatch": "Mật khẩu không khớp",
+      "orSignUpWithEmail": "hoặc đăng ký bằng email",
+      "agreeToTerms": "Tôi đồng ý với",
+      "termsOfService": "Điều khoản dịch vụ",
+      "and": "và",
+      "privacyPolicy": "Chính sách bảo mật",
+      "createAccount": "Tạo tài khoản",
+      "creatingAccount": "Đang tạo tài khoản...",
+      "alreadyHaveAccount": "Đã có tài khoản",
+      "signInLink": "Đăng nhập"
+    },
+    "layout": {
+      "welcomeTitle": "Chào mừng đến với DDMS",
+      "welcomeDescription": "Hệ thống quản lý và hỗ trợ đặt tour du lịch đường thủy tại thành phố Đà Nẵng. Trải nghiệm sông nước tuyệt vời chỉ với vài thao tác đơn giản.",
+      "feature1": "Quản lý tour đường thủy dễ dàng",
+      "feature2": "Đặt lịch & theo dõi chuyến đi realtime",
+      "feature3": "Khám phá vẻ đẹp sông Hàn, Đà Nẵng"
+    }
+  },
+  "dashboard": {
+    "title": "Chuyến đi của bạn",
+    "welcome": "Quản lý các chuyến đi và lịch trình của bạn",
+    "tabs": {
+      "all": "Tất cả",
+      "upcoming": "Sắp khởi hành",
+      "completed": "Đã đi"
+    },
+    "status": {
+      "UPCOMING": "Sắp khởi hành",
+      "COMPLETED": "Hoàn tất",
+      "CANCELLED": "Đã huỷ"
+    },
+    "bookingRef": "Mã đặt chỗ",
+    "guests": "khách",
+    "cancelBooking": "Huỷ chuyến",
+    "writeReview": "Đánh giá",
+    "viewDetails": "Xem chi tiết",
+    "emptyTitle": "Chưa có chuyến đi nào được đặt... cả!",
+    "emptyDescription": "Đã đến lúc phủi bụi hành lý và bắt đầu lên kế hoạch cho chuyến phiêu lưu tiếp theo.",
+    "exploreBtn": "Bắt đầu tìm kiếm"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Đã xảy ra lỗi",
+    "retry": "Thử lại",
+    "tryAgain": "Thử lại",
+    "somethingWentWrong": "Đã xảy ra sự cố",
+    "unexpectedError": "Đã xảy ra lỗi không mong muốn"
+  },
+  "validation": {
+    "required": "{{field}} là bắt buộc",
+    "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ",
+    "minLength": "Phải có ít nhất {{count}} ký tự",
+    "termsRequired": "Bạn phải đồng ý với các điều khoản và điều kiện"
+  },
+  "becomeOwner": {
+    "navLink": "Trở thành chủ thuyền",
+    "hero": {
+      "eyebrow": "DDMS cho chủ thuyền",
+      "title": "Phát triển hoạt động tour đường thủy",
+      "description": "Quản lý tàu, tour, lịch khởi hành và booking của khách trong một quy trình vận hành dành cho du lịch đường thủy Đà Nẵng.",
+      "primaryCta": "Đăng ký làm chủ thuyền",
+      "secondaryCta": "Khám phá tour"
+    },
+    "benefits": {
+      "title": "Vận hành hằng ngày ở một nơi",
+      "subtitle": "DDMS mang đến không gian làm việc tập trung cho chủ thuyền: đăng tour, xếp lịch tàu và theo dõi nhu cầu đặt chỗ.",
+      "items": {
+        "manageTours": {
+          "title": "Quản lý tour",
+          "description": "Tạo tour, cập nhật giá, sắp xếp hình ảnh và giữ thông tin hiển thị luôn sẵn sàng để khách đặt."
+        },
+        "scheduleBoats": {
+          "title": "Xếp lịch tàu",
+          "description": "Gắn tàu vào lịch khởi hành, theo dõi tình trạng sẵn sàng và tránh trùng ca vận hành."
+        },
+        "receiveBookings": {
+          "title": "Nhận booking",
+          "description": "Xem đặt chỗ của khách, trạng thái booking, số khách, dịch vụ đi kèm và ghi chú chuyến đi."
+        }
+      }
+    },
+    "process": {
+      "title": "Quy trình rõ ràng để mở bán tour đầu tiên",
+      "subtitle": "Luồng chủ thuyền ưu tiên xác minh trước, sau đó mới mở các công cụ vận hành tour.",
+      "steps": {
+        "profile": {
+          "title": "Tạo hồ sơ chủ thuyền",
+          "description": "Thêm tên doanh nghiệp, địa chỉ vận hành và thông tin liên hệ để hỗ trợ khách."
+        },
+        "verify": {
+          "title": "Xác minh giấy phép",
+          "description": "Gửi thông tin giấy phép để nền tảng kiểm tra điều kiện trước khi mở booking."
+        },
+        "publish": {
+          "title": "Đăng tour",
+          "description": "Thêm tàu, tạo tour, thiết lập lịch khởi hành và bắt đầu nhận đặt chỗ."
+        }
+      }
+    },
+    "requirements": {
+      "title": "Thông tin cần chuẩn bị",
+      "subtitle": "Các thông tin này giúp nền tảng xác minh hoạt động và hiển thị chuyến đi chính xác cho du khách.",
+      "cta": "Bắt đầu đăng ký",
+      "items": {
+        "license": {
+          "title": "Giấy phép kinh doanh hoặc vận hành",
+          "description": "Chuẩn bị số giấy phép và ảnh giấy tờ rõ ràng để gửi xét duyệt."
+        },
+        "boatInfo": {
+          "title": "Thông tin tàu",
+          "description": "Chuẩn bị tên tàu, loại tàu, sức chứa, hình ảnh, cabin và dịch vụ trên tàu."
+        },
+        "contact": {
+          "title": "Liên hệ vận hành",
+          "description": "Cung cấp số điện thoại kinh doanh và địa chỉ hỗ trợ để phối hợp booking."
+        }
+      }
+    }
+  },
+  "ownerDashboard": {
+    "eyebrow": "Không gian chủ thuyền",
+    "title": "Dashboard vận hành hôm nay",
+    "description": "Theo dõi lịch khởi hành, tình trạng tàu, booking cần xử lý và các vấn đề cần kiểm tra trước khi khách đến bến.",
+    "actions": {
+      "createTour": "Tạo tour",
+      "viewSchedule": "Xem lịch chạy"
+    },
+    "metrics": {
+      "todayBookings": {
+        "label": "Booking hôm nay",
+        "helper": "Bao gồm đặt chỗ đã xác nhận và đang chờ cho chuyến hôm nay."
+      },
+      "todayRevenue": {
+        "label": "Doanh thu hôm nay",
+        "helper": "Tổng thanh toán từ các lịch khởi hành trong ngày."
+      },
+      "departures": {
+        "label": "Lịch khởi hành",
+        "helper": "Các chuyến đã xếp lịch, đang lên tàu hoặc đang chạy."
+      },
+      "readyBoats": {
+        "label": "Tàu sẵn sàng",
+        "helper": "Số tàu có thể vận hành ngoài khung bảo trì."
+      }
+    },
+    "departures": {
+      "title": "Lịch khởi hành hôm nay",
+      "subtitle": "Theo dõi sức chứa, bến tàu và trạng thái từng chuyến.",
+      "guests": "khách đã đặt"
+    },
+    "fleet": {
+      "title": "Trạng thái đội tàu",
+      "subtitle": "Xem nhanh tàu và lịch vận hành kế tiếp.",
+      "next": "Tiếp theo"
+    },
+    "bookings": {
+      "title": "Booking cần theo dõi",
+      "subtitle": "Các đặt chỗ mới nhất cần chủ thuyền nắm tình trạng.",
+      "guests": "khách"
+    },
+    "readiness": {
+      "title": "Mức sẵn sàng vận hành",
+      "subtitle": "Những mục cần kiểm tra trước khi mở thêm sức chứa.",
+      "review": "Kiểm tra lịch chạy",
+      "items": {
+        "profile": {
+          "title": "Hồ sơ chủ thuyền đã xác minh",
+          "description": "Thông tin doanh nghiệp và liên hệ vận hành đã sẵn sàng."
+        },
+        "boats": {
+          "title": "Đội tàu chính đã cấu hình",
+          "description": "Sức chứa, hình ảnh, cabin và dịch vụ trên tàu đã có dữ liệu."
+        },
+        "maintenance": {
+          "title": "Còn lịch bảo trì cần xác nhận",
+          "description": "Một tàu vẫn cần chốt khung bảo trì để tránh trùng lịch."
+        },
+        "capacity": {
+          "title": "Cần rà soát sức chứa",
+          "description": "Các chuyến cuối tuần gần đầy chỗ và có thể cần thêm tàu."
+        }
+      }
+    },
+    "status": {
+      "schedule": {
+        "boarding": "Đang lên tàu",
+        "scheduled": "Đã xếp lịch",
+        "attention": "Cần kiểm tra"
+      },
+      "booking": {
+        "pending": "Chờ thanh toán",
+        "paid": "Đã thanh toán",
+        "review": "Cần rà soát"
+      },
+      "boat": {
+        "running": "Đang chạy",
+        "idle": "Sẵn sàng",
+        "maintenance": "Bảo trì"
+      }
+    }
+  },
+  "home": {
+    "nav": {
+      "tours": "Tour",
+      "howItWorks": "Cách hoạt động",
+      "destinations": "Điểm đến",
+      "signIn": "Đăng nhập"
+    },
+    "hero": {
+      "title": "Khám phá vẻ đẹp đường thủy Đà Nẵng",
+      "description": "Đặt tour du thuyền sông Hàn, ngắm cầu Rồng phun lửa và trải nghiệm hành trình sông nước tuyệt vời.",
+      "searchPlaceholder": "Tìm kiếm tour, địa điểm...",
+      "searchButton": "Tìm kiếm",
+      "stat1": "Chuyến đi",
+      "stat2": "Khách hàng",
+      "stat3": "Đánh giá"
+    },
+    "categories": {
+      "cruise": "Du thuyền",
+      "sunset": "Hoàng hôn",
+      "party": "Tiệc trên thuyền",
+      "family": "Gia đình",
+      "sightseeing": "Ngắm cảnh",
+      "dinner": "Ăn tối"
+    },
+    "tours": {
+      "title": "Tour nổi bật",
+      "subtitle": "Những trải nghiệm đường thủy được yêu thích nhất tại Đà Nẵng",
+      "viewAll": "Xem tất cả",
+      "reviews": "đánh giá",
+      "perPerson": "người"
+    },
+    "howItWorks": {
+      "title": "Đặt tour chỉ 4 bước",
+      "subtitle": "Dễ dàng, nhanh chóng, đáng tin cậy",
+      "stepLabel": "Bước {{step}}",
+      "step1Title": "Tìm kiếm",
+      "step1Desc": "Khám phá các tour đường thủy theo vị trí, giá cả hoặc ngày khởi hành.",
+      "step2Title": "Đặt lịch",
+      "step2Desc": "Chọn ngày, giờ và số lượng hành khách phù hợp.",
+      "step3Title": "Lên thuyền",
+      "step3Desc": "Đến bến tàu và bắt đầu hành trình tuyệt vời trên sông.",
+      "step4Title": "Đánh giá",
+      "step4Desc": "Chia sẻ trải nghiệm của bạn để giúp các du khách khác."
+    },
+    "destinations": {
+      "title": "Điểm đến phổ biến",
+      "hanRiver": "Sông Hàn",
+      "marbleMountains": "Ngũ Hành Sơn",
+      "bachDang": "Bến Bạch Đằng",
+      "toursAvailable": "tour có sẵn"
+    },
+    "cta": {
+      "title": "Sẵn sàng cho hành trình trên sông?",
+      "description": "Đăng ký ngay hôm nay và nhận ưu đãi đặc biệt cho lần đặt tour đầu tiên.",
+      "signUp": "Đăng ký miễn phí",
+      "explore": "Khám phá tour"
+    },
+    "footer": {
+      "description": "Hệ thống quản lý và đặt tour du lịch đường thủy tại thành phố Đà Nẵng.",
+      "rights": "Mọi quyền được bảo lưu.",
+      "madeIn": "Made with ❤️ in Đà Nẵng",
+      "explore": {
+        "title": "Khám phá",
+        "link1": "Tour du thuyền",
+        "link2": "Tour hoàng hôn",
+        "link3": "Tour gia đình"
+      },
+      "support": {
+        "title": "Hỗ trợ",
+        "link1": "Trung tâm trợ giúp",
+        "link2": "Liên hệ",
+        "link3": "Câu hỏi thường gặp"
+      },
+      "legal": {
+        "title": "Pháp lý",
+        "link1": "Điều khoản dịch vụ",
+        "link2": "Chính sách bảo mật",
+        "link3": "Chính sách huỷ tour"
+      }
+    }
+  },
+  "profile": {
+    "title": "Hồ sơ cá nhân",
+    "uploadAvatar": "Thay đổi ảnh đại diện",
+    "personalInfo": "Thông tin cá nhân",
+    "edit": "Chỉnh sửa",
+    "cancel": "Huỷ",
+    "save": "Lưu thay đổi",
+    "saving": "Đang lưu...",
+    "fields": {
+      "fullName": "Họ và tên",
+      "email": "Địa chỉ email",
+      "phone": "Số điện thoại",
+      "address": "Địa chỉ"
+    },
+    "changePassword": {
+      "title": "Đổi mật khẩu",
+      "description": "Đảm bảo tài khoản của bạn luôn an toàn",
+      "change": "Đổi mật khẩu",
+      "current": "Mật khẩu hiện tại",
+      "new": "Mật khẩu mới",
+      "confirm": "Xác nhận mật khẩu mới",
+      "update": "Cập nhật mật khẩu",
+      "errors": {
+        "currentRequired": "Vui lòng nhập mật khẩu hiện tại",
+        "newRequired": "Vui lòng nhập mật khẩu mới",
+        "minLength": "Mật khẩu phải có ít nhất 6 ký tự",
+        "mismatch": "Mật khẩu xác nhận không khớp"
+      }
+    }
+  },
+  "tour": {
+    "backToHome": "Quay lại trang chủ",
+    "gallery": {
+      "photo": "Ảnh"
+    },
+    "info": {
+      "duration": "Thời gian",
+      "maxGuests": "Số khách tối đa",
+      "people": "người",
+      "boat": "Tàu",
+      "about": "Giới thiệu về tour"
+    },
+    "reviews": {
+      "title": "đánh giá"
+    },
+    "booking": {
+      "perPerson": "người",
+      "availability": "Tình trạng",
+      "available": "Còn chỗ",
+      "cancellation": "Chính sách huỷ",
+      "freeCancellation": "Miễn phí huỷ",
+      "bookNow": "Đặt ngay",
+      "addWishlist": "Thêm vào yêu thích",
+      "noChargeYet": "Bạn chưa bị tính phí"
+    }
+  },
+  "booking": {
+    "title": "Đặt tour",
+    "backToTour": "Quay lại chi tiết tour",
+    "next": "Tiếp theo",
+    "back": "Quay lại",
+    "steps": {
+      "date": "Ngày giờ",
+      "boat": "Chọn thuyền",
+      "rooms": "Xem phòng",
+      "guests": "Số khách",
+      "confirm": "Xác nhận"
+    },
+    "boat": {
+      "title": "Chọn thuyền",
+      "subtitle": "Chọn thuyền cho chuyến đi của bạn. Một số thuyền có thể không khả dụng.",
+      "available": "Còn trống",
+      "unavailable": "Không khả dụng",
+      "capacity": "Sức chứa",
+      "types": {
+        "cruise": "Du thuyền",
+        "luxury": "Hạng sang",
+        "standard": "Tiêu chuẩn",
+        "party": "Tiệc",
+        "speedboat": "Ca nô"
+      }
+    },
+    "dateTime": {
+      "title": "Chọn ngày và giờ",
+      "subtitle": "Chọn ngày và khung giờ phù hợp với bạn",
+      "selectDate": "Chọn ngày",
+      "selectTime": "Chọn giờ khởi hành"
+    },
+    "guests": {
+      "title": "Số lượng hành khách",
+      "subtitle": "Tối đa {{max}} khách mỗi chuyến",
+      "people": "người"
+    },
+    "confirm": {
+      "title": "Xác nhận đặt tour",
+      "subtitle": "Kiểm tra lại thông tin trước khi thanh toán",
+      "pay": "Thanh toán & Xác nhận",
+      "processing": "Đang xử lý..."
+    },
+    "rooms": {
+      "title": "Xem phòng & cabin",
+      "subtitle": "Danh sách phòng trên thuyền {{boat}}. Bạn có thể chọn phòng hoặc bỏ qua.",
+      "selected": "Đã chọn",
+      "viewDetail": "Xem chi tiết",
+      "amenitiesLabel": "Tiện nghi",
+      "ratingOverview": "Tổng quan đánh giá",
+      "reviewsLabel": "Đánh giá từ khách hàng",
+      "closeModal": "Đóng",
+      "selectRoom": "Chọn phòng này",
+      "unselectRoom": "Bỏ chọn"
+    },
+    "summary": {
+      "tour": "Tour",
+      "date": "Ngày",
+      "time": "Giờ",
+      "guests": "Số khách",
+      "boat": "Thuyền",
+      "room": "Phòng",
+      "total": "Tổng cộng"
+    },
+    "success": {
+      "title": "Đặt tour thành công!",
+      "description": "Cảm ơn bạn đã đặt tour. Chúng tôi sẽ gửi email xác nhận cho bạn.",
+      "viewBookings": "Xem đặt tour của tôi",
+      "backHome": "Về trang chủ"
+    }
+  },
+  "tourList": {
+    "title": "Khám phá tour",
+    "subtitle": "Tìm thấy {{count}} chuyến du thuyền",
+    "searchPlaceholder": "Tìm kiếm tour, địa điểm...",
+    "filters": "Bộ lọc",
+    "reviews": "đánh giá",
+    "perPerson": "người",
+    "categories": {
+      "all": "Tất cả",
+      "cruise": "Du thuyền",
+      "sunset": "Hoàng hôn",
+      "party": "Tiệc",
+      "family": "Gia đình",
+      "sightseeing": "Ngắm cảnh",
+      "dinner": "Ăn tối"
+    },
+    "sort": {
+      "rating": "Đánh giá cao nhất",
+      "priceAsc": "Giá thấp → cao",
+      "priceDesc": "Giá cao → thấp"
+    },
+    "empty": {
+      "title": "Không tìm thấy tour nào",
+      "description": "Thử thay đổi từ khoá hoặc bộ lọc để tìm chuyến phù hợp.",
+      "reset": "Xoá bộ lọc"
+    }
+  },
+  "boatDetail": {
+    "viewDetails": "Xem chi tiết",
+    "notFound": "Không tìm thấy thuyền",
+    "notFoundDesc": "Thuyền bạn đang tìm không tồn tại hoặc đã bị xóa.",
+    "backToTours": "Quay lại tour",
+    "about": "Giới thiệu về thuyền",
+    "amenities": "Tiện nghi & Cơ sở vật chất",
+    "schedule": "Lịch hoạt động",
+    "captain": "Thuyền trưởng",
+    "safety": "Chứng nhận an toàn",
+    "safetyDesc": "Đáp ứng tất cả tiêu chuẩn an toàn hàng hải",
+    "trips": "chuyến",
+    "totalTrips": "Tổng chuyến",
+    "rating": "Đánh giá",
+    "bookWithBoat": "Đặt tour với thuyền này",
+    "viewRooms": "Xem phòng & cabin",
+    "currentlyUnavailable": "Hiện không khả dụng",
+    "specs": {
+      "capacity": "Sức chứa",
+      "speed": "Tốc độ tối đa",
+      "length": "Chiều dài",
+      "yearBuilt": "Năm đóng"
+    }
+  },
+  "rooms": {
+    "title": "Phòng & Cabin",
+    "subtitle": "{{count}} phòng có sẵn trên thuyền",
+    "searchPlaceholder": "Tìm phòng...",
+    "available": "còn trống",
+    "soldOut": "Hết phòng",
+    "reviews": "đánh giá",
+    "perNight": "đêm",
+    "adults": "người lớn",
+    "children": "trẻ em",
+    "showReviews": "Đánh giá",
+    "bookRoom": "Đặt phòng này",
+    "found": "{{count}} phòng phù hợp",
+    "roomsMatch": "phòng phù hợp",
+    "steps": {
+      "guests": "Số khách",
+      "selectRoom": "Chọn phòng",
+      "guestsTitle": "Bao nhiêu khách?",
+      "guestsSubtitle": "Cho chúng tôi biết ai sẽ đi để tìm phòng phù hợp.",
+      "selectRoomTitle": "Chọn phòng của bạn",
+      "selectRoomSubtitle": "Hiển thị phòng cho {{rooms}} phòng, {{adults}} người lớn, {{children}} trẻ em",
+      "viewRooms": "Xem phòng phù hợp"
+    },
+    "filter": {
+      "rooms": "Số phòng",
+      "adults": "Người lớn",
+      "children": "Trẻ em",
+      "sortBy": "Sắp xếp"
+    },
+    "sort": {
+      "rating": "Đánh giá cao nhất",
+      "priceAsc": "Giá thấp → cao",
+      "priceDesc": "Giá cao → thấp"
+    },
+    "empty": {
+      "title": "Không tìm thấy phòng",
+      "description": "Thử thay đổi bộ lọc để tìm phòng phù hợp.",
+      "reset": "Xoá bộ lọc"
+    }
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "tours": "Tours"
+  },
+  "header": {
+    "user": {
+      "ownerDashboard": "Dashboard chủ thuyền",
+      "profile": "Hồ sơ cá nhân",
+      "myTours": "Tour của tôi",
+      "logout": "Đăng xuất"
+    }
+  },
+  "ownerLayout": {
+    "brand": "OWNER",
+    "nav": {
+      "dashboard": "Dashboard",
+      "boats": "Quản lý Thuyền",
+      "tours": "Quản lý Tour",
+      "bookings": "Booking",
+      "profile": "Hồ sơ doanh nghiệp"
+    },
+    "backHome": "Về trang chủ",
+    "logout": "Đăng xuất",
+    "collapse": "Thu gọn",
+    "role": "Chủ thuyền"
+  },
+  "ownerDash": {
+    "title": "Dashboard",
+    "subtitle": "Tổng quan hoạt động kinh doanh",
+    "stats": {
+      "totalBoats": "Tổng thuyền",
+      "activeTours": "Tour hoạt động",
+      "monthlyBookings": "Booking tháng",
+      "monthlyRevenue": "Doanh thu tháng"
+    },
+    "quickStart": "Bắt đầu nhanh",
+    "links": {
+      "boats": "Quản lý thuyền",
+      "boatsDesc": "Xem và quản lý đội thuyền",
+      "tours": "Quản lý tour",
+      "toursDesc": "Tạo và chỉnh sửa tour",
+      "bookings": "Xem booking",
+      "bookingsDesc": "Theo dõi đặt chỗ"
+    }
+  },
+  "ownerBoats": {
+    "title": "Quản lý Thuyền",
+    "subtitle": "Quản lý toàn bộ đội thuyền của bạn",
+    "addBoat": "Thêm thuyền mới",
+    "stats": {
+      "total": "Tổng thuyền",
+      "running": "Đang hoạt động",
+      "idle": "Đang rỗi",
+      "revenue": "Tổng doanh thu"
+    },
+    "search": "Tìm kiếm thuyền...",
+    "filter": {
+      "all": "Tất cả",
+      "running": "Đang chạy",
+      "idle": "Rỗi",
+      "allTypes": "Tất cả loại"
+    },
+    "view": {
+      "grid": "Lưới",
+      "table": "Bảng"
+    },
+    "empty": {
+      "title": "Không tìm thấy thuyền",
+      "filtered": "Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm",
+      "noBoats": "Bắt đầu bằng cách thêm thuyền đầu tiên của bạn"
+    },
+    "card": {
+      "revenue": "doanh thu",
+      "guests": "Khách",
+      "rooms": "Phòng",
+      "services": "DV",
+      "tours": "Tour",
+      "edit": "Chỉnh sửa",
+      "viewPublic": "Xem trang công khai",
+      "delete": "Xoá thuyền",
+      "maintenance": "Bảo trì"
+    },
+    "table": {
+      "boat": "Thuyền",
+      "type": "Loại",
+      "status": "Trạng thái",
+      "capacity": "Sức chứa",
+      "rooms": "Phòng",
+      "services": "Dịch vụ",
+      "tours": "Tour",
+      "revenue": "Doanh thu",
+      "actions": "Thao tác"
+    },
+    "delete": {
+      "title": "Xoá thuyền \"{{name}}\"?",
+      "description": "Thao tác này không thể hoàn tác. Toàn bộ dữ liệu liên quan (phòng, dịch vụ, hình ảnh) sẽ bị xoá vĩnh viễn.",
+      "cancel": "Huỷ",
+      "confirm": "Xoá"
+    },
+    "status": {
+      "running": "Đang chạy",
+      "idle": "Rỗi"
+    },
+    "types": {
+      "cruise": "Du thuyền",
+      "standard": "Thuyền tiêu chuẩn",
+      "luxury": "Cao cấp",
+      "party": "Thuyền tiệc",
+      "speedboat": "Ca nô cao tốc"
+    },
+    "form": {
+      "createTitle": "Thêm thuyền mới",
+      "editTitle": "Chỉnh sửa: {{name}}",
+      "createSubtitle": "Điền thông tin cho thuyền mới",
+      "editSubtitle": "Cập nhật thông tin thuyền",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu...",
+      "tabs": {
+        "basic": "Thông tin",
+        "cabins": "Phòng",
+        "services": "Dịch vụ",
+        "images": "Hình ảnh",
+        "maintenance": "Bảo trì"
+      },
+      "basic": {
+        "title": "Thông tin cơ bản",
+        "name": "Tên thuyền",
+        "namePlaceholder": "VD: Rồng Vàng",
+        "type": "Loại thuyền",
+        "capacity": "Sức chứa tối đa (người)",
+        "capacityPlaceholder": "VD: 40"
+      },
+      "cabins": {
+        "count": "{{count}} phòng / cabin",
+        "add": "Thêm phòng",
+        "empty": "Chưa có phòng nào. Thêm phòng đầu tiên!",
+        "label": "Phòng #{{index}}",
+        "name": "Tên phòng",
+        "capacity": "Sức chứa",
+        "price": "Giá (VNĐ)",
+        "totalRooms": "Số phòng"
+      },
+      "services": {
+        "count": "{{count}} dịch vụ",
+        "add": "Thêm dịch vụ",
+        "empty": "Chưa có dịch vụ nào.",
+        "name": "Tên dịch vụ",
+        "price": "Giá (VNĐ)",
+        "active": "Đang hoạt động"
+      },
+      "images": {
+        "title": "Hình ảnh thuyền",
+        "add": "Thêm ảnh",
+        "dragDrop": "Kéo thả hoặc click để upload ảnh",
+        "select": "Chọn ảnh"
+      },
+      "maintenance": {
+        "title": "Lịch bảo trì",
+        "add": "Thêm lịch",
+        "empty": "Chưa có lịch bảo trì nào.",
+        "default": "Bảo trì"
+      }
+    }
+  }
+}

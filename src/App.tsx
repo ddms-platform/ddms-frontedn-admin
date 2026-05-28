@@ -1,0 +1,179 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import AuthLayout from '@/components/layouts/auth-layout';
+import AdminLayout from '@/components/layouts/admin-layout';
+import { ErrorBoundary } from './components/shared/error-boundary';
+import ProtectedRoute from './components/routes/ProtectedRoute';
+import { lazy, Suspense } from 'react';
+import { LanguageProvider } from './contexts/LanguageContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { LoadingSpinner } from './components/common/LoadingSpinner';
+import { routeName } from '@/constants/route-name';
+
+const SignInPage = lazy(() => import('@/pages/auth/sign-in'));
+const SignUpPage = lazy(() => import('@/pages/auth/sign-up'));
+
+// ── Admin pages ──────────────────────────────────────────────────────────────
+const AdminDashboard = lazy(() => import('@/pages/admin/index'));
+const AdminUsers = lazy(() => import('@/pages/admin/users/index'));
+const AdminOwnerVerification = lazy(
+  () => import('@/pages/admin/owner-verification/index'),
+);
+const AdminDocks = lazy(() => import('@/pages/admin/docks/index'));
+const AdminPromotions = lazy(() => import('@/pages/admin/promotions/index'));
+const AdminRevenue = lazy(() => import('@/pages/admin/revenue/index'));
+const AdminTopTours = lazy(() => import('@/pages/admin/top-tours/index'));
+const AdminBoats = lazy(() => import('@/pages/admin/boats/index'));
+const AdminReviews = lazy(() => import('@/pages/admin/reviews/index'));
+const AdminFaqs = lazy(() => import('@/pages/admin/faqs/index'));
+const AdminNotifications = lazy(
+  () => import('@/pages/admin/notifications/index'),
+);
+const AdminAuditLogs = lazy(() => import('@/pages/admin/audit-logs/index'));
+
+function PageLoader() {
+  return <LoadingSpinner fullScreen />;
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <LanguageProvider>
+            <Routes>
+              {/* Auth Routes - own layout, no header/footer */}
+              <Route element={<AuthLayout />}>
+                <Route
+                  path={routeName.signIn}
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <SignInPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path={routeName.signUp}
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <SignUpPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+
+              {/* Admin pages — role-gated */}
+              <Route element={<ProtectedRoute roles={['admin']} />}>
+                <Route element={<AdminLayout />}>
+                  <Route
+                    path={routeName.admin}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminDashboard />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminUsers}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminUsers />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminOwnerVerification}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminOwnerVerification />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminDocks}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminDocks />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminPromotions}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminPromotions />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminRevenue}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminRevenue />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminTopTours}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminTopTours />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminBoats}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminBoats />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminReviews}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminReviews />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminFaqs}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminFaqs />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminNotifications}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminNotifications />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminAuditLogs}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminAuditLogs />
+                      </Suspense>
+                    }
+                  />
+                </Route>
+              </Route>
+
+              {/* Catch-all */}
+              <Route
+                path="*"
+                element={<Navigate to={routeName.admin} replace />}
+              />
+            </Routes>
+          </LanguageProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
+  );
+}
+
+export default App;
