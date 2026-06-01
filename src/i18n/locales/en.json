@@ -1,4 +1,4 @@
-{
+﻿{
   "auth": {
     "signIn": {
       "title": "Welcome back",
@@ -536,6 +536,27 @@
       "profile": "My Profile",
       "myTours": "My Tours",
       "logout": "Sign out"
+    }
+  },
+  "adminLayout": {
+    "brand": "ADMIN",
+    "backHome": "Back to home",
+    "logout": "Sign out",
+    "collapse": "Collapse",
+    "role": "Administrator",
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "ownerVerification": "Owner Verification",
+      "docks": "Docks",
+      "promotions": "Promotions",
+      "revenue": "Revenue",
+      "topTours": "Top Tours",
+      "boats": "Boats",
+      "reviews": "Reviews",
+      "faqs": "FAQs",
+      "notifications": "Notifications",
+      "auditLogs": "Audit Logs"
     }
   },
   "ownerLayout": {

@@ -1,4 +1,4 @@
-{
+﻿{
   "auth": {
     "signIn": {
       "title": "Chào mừng trở lại",
@@ -536,6 +536,27 @@
       "profile": "Hồ sơ cá nhân",
       "myTours": "Tour của tôi",
       "logout": "Đăng xuất"
+    }
+  },
+  "adminLayout": {
+    "brand": "ADMIN",
+    "backHome": "Về trang chủ",
+    "logout": "Đăng xuất",
+    "collapse": "Thu gọn",
+    "role": "Quản trị viên",
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "Người dùng",
+      "ownerVerification": "Duyệt chủ thuyền",
+      "docks": "Bến tàu",
+      "promotions": "Khuyến mãi",
+      "revenue": "Doanh thu",
+      "topTours": "Tour nổi bật",
+      "boats": "Quản lý thuyền",
+      "reviews": "Đánh giá",
+      "faqs": "Hỏi đáp",
+      "notifications": "Thông báo",
+      "auditLogs": "Nhật ký hệ thống"
     }
   },
   "ownerLayout": {
