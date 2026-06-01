@@ -46,7 +46,7 @@ const CARD: React.CSSProperties = {
 };
 
 /* ─────────────────────── Types ─────────────────────── */
-type BoatStatus = 'active' | 'maintenance' | 'idle';
+type BoatStatus = 'idle' | 'running';
 type BoatType = 'cruise' | 'luxury' | 'standard' | 'party' | 'speedboat';
 
 const BOAT_TYPE_LABELS: Record<BoatType, string> = {
@@ -70,17 +70,11 @@ const DOCKS = [
 
 function StatusBadge({ status }: { status: string }) {
   const cfg = {
-    active: {
-      label: 'Hoạt động',
+    running: {
+      label: 'Đang hoạt động',
       color: '#10B981',
       bg: 'rgba(16,185,129,0.12)',
       icon: <CheckCircle size={10} />,
-    },
-    maintenance: {
-      label: 'Bảo trì',
-      color: '#F59E0B',
-      bg: 'rgba(245,158,11,0.12)',
-      icon: <Wrench size={10} />,
     },
     idle: {
       label: 'Nhàn rỗi',
@@ -1272,16 +1266,10 @@ function BoatDetailDrawer({
                         }}
                       >
                         <option
-                          value="active"
+                          value="running"
                           style={{ backgroundColor: '#0d1629' }}
                         >
-                          Hoạt động
-                        </option>
-                        <option
-                          value="maintenance"
-                          style={{ backgroundColor: '#0d1629' }}
-                        >
-                          Bảo trì
+                          Đang hoạt động
                         </option>
                         <option
                           value="idle"
@@ -1556,14 +1544,11 @@ function BoatFormModal({
                     color: '#fff',
                   }}
                 >
-                  <option value="active" style={{ backgroundColor: '#0a0f1e' }}>
-                    Hoạt động
-                  </option>
                   <option
-                    value="maintenance"
+                    value="running"
                     style={{ backgroundColor: '#0a0f1e' }}
                   >
-                    Bảo trì
+                    Đang hoạt động
                   </option>
                   <option value="idle" style={{ backgroundColor: '#0a0f1e' }}>
                     Nhàn rỗi
@@ -1609,9 +1594,8 @@ export default function AdminBoats() {
   const [boats, setBoats] = useState<BoatListItemResponse[]>([]);
   const [stats, setStats] = useState<BoatStatsResponse>({
     total: 0,
-    active: 0,
-    maintenance: 0,
     idle: 0,
+    running: 0,
   });
 
   const [loading, setLoading] = useState(true);
@@ -1691,17 +1675,10 @@ export default function AdminBoats() {
     },
     {
       label: 'Đang hoạt động',
-      value: stats.active,
+      value: stats.running,
       icon: <CheckCircle size={18} />,
       color: '#10B981',
       bg: 'rgba(16,185,129,0.12)',
-    },
-    {
-      label: 'Đang bảo trì',
-      value: stats.maintenance,
-      icon: <Wrench size={18} />,
-      color: '#F59E0B',
-      bg: 'rgba(245,158,11,0.12)',
     },
     {
       label: 'Nhàn rỗi',

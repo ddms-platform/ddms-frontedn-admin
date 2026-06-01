@@ -61,13 +61,22 @@ export interface BoatDetailResponse {
   cabins: BoatCabinResponse[];
   services: BoatServiceResponse[];
   images: BoatImageResponse[];
+  maintenances: BoatMaintenanceResponse[];
+}
+
+export interface BoatMaintenanceResponse {
+  id: string;
+  boatId: string;
+  startTime: string;
+  endTime: string;
+  reason?: string;
+  createdAt: string;
 }
 
 export interface BoatStatsResponse {
   total: number;
-  active: number;
-  maintenance: number;
   idle: number;
+  running: number;
 }
 
 export interface PagedResponse<T> {
