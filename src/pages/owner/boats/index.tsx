@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { boatApi } from '@/services/boat-api';
+import { ownerBoatApi } from '@/services/boat-api';
 import {
   Ship,
   Plus,
@@ -1669,7 +1669,7 @@ export default function OwnerBoats() {
   const fetchBoats = async () => {
     setLoading(true);
     try {
-      const res = await boatApi.getBoats({ pageSize: 100 });
+      const res = await ownerBoatApi.getBoats({ pageSize: 100 });
       const items = res.data?.result?.items ?? [];
       const mapped: Boat[] = items.map((b: any) => ({
         id: b.id,
@@ -1732,7 +1732,7 @@ export default function OwnerBoats() {
   const handleSave = async (data: Partial<Boat>) => {
     try {
       if (editBoat) {
-        await boatApi.update(editBoat.id, {
+        await ownerBoatApi.update(editBoat.id, {
           name: data.name!,
           type: data.type,
           maxPassengers: data.maxPassengers!,
@@ -1740,7 +1740,7 @@ export default function OwnerBoats() {
         });
         toast.success('Đã cập nhật thuyền');
       } else {
-        await boatApi.create({
+        await ownerBoatApi.create({
           name: data.name!,
           type: data.type,
           maxPassengers: data.maxPassengers!,
@@ -1757,7 +1757,7 @@ export default function OwnerBoats() {
 
   const handleDelete = async (id: string) => {
     try {
-      await boatApi.delete(id);
+      await ownerBoatApi.delete(id);
       toast.success('Đã xóa thuyền');
       setConfirmDelete(null);
       if (selectedBoat?.id === id) setSelectedBoat(null);
