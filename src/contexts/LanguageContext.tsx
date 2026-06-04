@@ -28,7 +28,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     (lang: Language) => {
       i18n.changeLanguage(lang === 'EN' ? 'en' : 'vn');
     },
-    [i18n],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   const value = useMemo(

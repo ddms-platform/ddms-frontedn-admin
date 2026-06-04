@@ -61,13 +61,22 @@ export interface BoatDetailResponse {
   cabins: BoatCabinResponse[];
   services: BoatServiceResponse[];
   images: BoatImageResponse[];
+  maintenances: BoatMaintenanceResponse[];
+}
+
+export interface BoatMaintenanceResponse {
+  id: string;
+  boatId: string;
+  startTime: string;
+  endTime: string;
+  reason?: string;
+  createdAt: string;
 }
 
 export interface BoatStatsResponse {
   total: number;
-  active: number;
-  maintenance: number;
   idle: number;
+  running: number;
 }
 
 export interface PagedResponse<T> {
@@ -247,4 +256,29 @@ export const boatApi = {
     Api.del<ApiResponse<{ deleted: boolean }>>(
       `/admin/boats/${boatId}/images/${imageId}`,
     ),
+};
+
+// ────────────────────────────────────────────────────────────
+// API functions — Boats (Owner)
+// ────────────────────────────────────────────────────────────
+
+export const ownerBoatApi = {
+  getBoats: (query: BoatListQuery = {}) =>
+    Api.get<ApiResponse<PagedResponse<BoatListItemResponse>>>('/owner/boats', {
+      params: query,
+    }),
+
+  getStats: () => Api.get<ApiResponse<BoatStatsResponse>>('/owner/boats/stats'),
+
+  getById: (id: string) =>
+    Api.get<ApiResponse<BoatDetailResponse>>(`/owner/boats/${id}`),
+
+  create: (data: CreateBoatRequest) =>
+    Api.post<ApiResponse<BoatDetailResponse>>('/owner/boats', data),
+
+  update: (id: string, data: UpdateBoatRequest) =>
+    Api.put<ApiResponse<BoatDetailResponse>>(`/owner/boats/${id}`, data),
+
+  delete: (id: string) =>
+    Api.del<ApiResponse<{ deleted: boolean }>>(`/owner/boats/${id}`),
 };
