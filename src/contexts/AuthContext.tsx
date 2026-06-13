@@ -26,17 +26,23 @@ function isUserRole(role: unknown): role is UserRole {
 function normalizeUser(rawUser: unknown): User | null {
   if (!rawUser || typeof rawUser !== 'object') return null;
 
-  const user = rawUser as Partial<User>;
+  const user = rawUser as any;
   if (typeof user.name !== 'string' || typeof user.email !== 'string')
     return null;
 
   const roles = Array.isArray(user.roles) ? user.roles.filter(isUserRole) : [];
+  const avatarUrl =
+    typeof user.avatar_url === 'string'
+      ? user.avatar_url
+      : typeof user.avatar === 'string'
+        ? user.avatar
+        : undefined;
 
   return {
     name: user.name,
     email: user.email,
     roles: roles.length > 0 ? roles : ['user'],
-    ...(typeof user.avatar === 'string' ? { avatar: user.avatar } : {}),
+    ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
   };
 }
 
@@ -81,6 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!normalizedUser) return;
 
     localStorage.setItem(TOKEN_KEY, newToken);
+    localStorage.setItem('access_token', JSON.stringify(newToken));
     localStorage.setItem(USER_KEY, JSON.stringify(normalizedUser));
     setToken(newToken);
     setUser(normalizedUser);
@@ -88,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem('access_token');
     localStorage.removeItem(USER_KEY);
     setToken(null);
     setUser(null);

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   Users,
   Ship,
@@ -7,142 +8,19 @@ import {
   Anchor,
   Star,
   AlertCircle,
-  CheckCircle,
-  Clock,
   ArrowUpRight,
   ArrowDownRight,
+  Loader2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { routeName } from '@/constants/route-name';
+import { Api } from '@/services/axios';
 
 const ACCENT = '#FF385C';
 const CARD = {
   backgroundColor: '#0d1629',
   border: '1px solid rgba(255,255,255,0.06)',
 } as const;
-
-const STATS = [
-  {
-    label: 'Tổng người dùng',
-    value: '2,847',
-    change: '+12.4%',
-    up: true,
-    icon: Users,
-    color: '#FF385C',
-    bg: 'rgba(255,56,92,0.12)',
-  },
-  {
-    label: 'Tour đang hoạt động',
-    value: '134',
-    change: '+5.1%',
-    up: true,
-    icon: CalendarCheck,
-    color: '#10B981',
-    bg: 'rgba(16,185,129,0.12)',
-  },
-  {
-    label: 'Thuyền đang rảnh',
-    value: '38',
-    change: '-3.2%',
-    up: false,
-    icon: Ship,
-    color: '#F59E0B',
-    bg: 'rgba(245,158,11,0.12)',
-  },
-  {
-    label: 'Doanh thu tháng này',
-    value: '₫ 482M',
-    change: '+21.7%',
-    up: true,
-    icon: TrendingUp,
-    color: '#8B5CF6',
-    bg: 'rgba(139,92,246,0.12)',
-  },
-];
-
-const BOOKING_STATUS = [
-  { label: 'Hoàn thành', value: 312, color: '#10B981', pct: 65 },
-  { label: 'Chờ xử lý', value: 87, color: '#F59E0B', pct: 18 },
-  { label: 'Đã hủy', value: 43, color: '#EF4444', pct: 9 },
-  { label: 'Đang diễn ra', value: 39, color: '#3B82F6', pct: 8 },
-];
-
-const RECENT = [
-  {
-    id: 'BK-2041',
-    customer: 'Nguyễn Văn A',
-    tour: 'Vịnh Hạ Long 3N2Đ',
-    amount: '₫ 4,500,000',
-    status: 'completed',
-    date: '26/05/2026',
-  },
-  {
-    id: 'BK-2040',
-    customer: 'Trần Thị B',
-    tour: 'Đảo Cát Bà Express',
-    amount: '₫ 1,200,000',
-    status: 'pending',
-    date: '26/05/2026',
-  },
-  {
-    id: 'BK-2039',
-    customer: 'Lê Hoàng C',
-    tour: 'Sunset Cruise HCM',
-    amount: '₫ 800,000',
-    status: 'completed',
-    date: '25/05/2026',
-  },
-  {
-    id: 'BK-2038',
-    customer: 'Phạm Thùy D',
-    tour: 'Vịnh Hạ Long 5N4Đ',
-    amount: '₫ 8,200,000',
-    status: 'cancelled',
-    date: '25/05/2026',
-  },
-  {
-    id: 'BK-2037',
-    customer: 'Hoàng Minh E',
-    tour: 'Nha Trang Snorkel',
-    amount: '₫ 2,100,000',
-    status: 'ongoing',
-    date: '24/05/2026',
-  },
-];
-
-const PENDING_VERIFY = [
-  {
-    name: 'Công ty Du thuyền Phúc Hải',
-    license: 'DL-2024-0091',
-    ago: '2 ngày trước',
-  },
-  {
-    name: 'HTX Tàu biển Cần Giờ',
-    license: 'DL-2024-0088',
-    ago: '4 ngày trước',
-  },
-  {
-    name: 'TNHH Dịch vụ Biển Xanh',
-    license: 'DL-2024-0085',
-    ago: '1 tuần trước',
-  },
-];
-
-const REV_BARS = [42, 68, 55, 79, 91, 65, 83, 74, 110, 98, 125, 108];
-const MONTHS = [
-  'T6',
-  'T7',
-  'T8',
-  'T9',
-  'T10',
-  'T11',
-  'T12',
-  'T1',
-  'T2',
-  'T3',
-  'T4',
-  'T5',
-];
 
 const ST_MAP: Record<string, { label: string; color: string; bg: string }> = {
   completed: {
@@ -163,8 +41,109 @@ const ST_MAP: Record<string, { label: string; color: string; bg: string }> = {
   },
 };
 
+const iconMap: Record<string, any> = {
+  'Tổng người dùng': Users,
+  'Tour đang hoạt động': CalendarCheck,
+  'Thuyền đang rảnh': Ship,
+  'Doanh thu tháng này': TrendingUp,
+};
+
+interface DashboardStats {
+  stats: Array<{
+    label: string;
+    value: string;
+    change: string;
+    up: boolean;
+    color: string;
+    bg: string;
+  }>;
+  bookingStatus: Array<{
+    label: string;
+    value: number;
+    color: string;
+    pct: number;
+  }>;
+  recentBookings: Array<{
+    id: string;
+    customer: string;
+    tour: string;
+    amount: string;
+    status: string;
+    date: string;
+  }>;
+  pendingVerify: Array<{
+    name: string;
+    license: string;
+    ago: string;
+  }>;
+  revenueBars: number[];
+  months: string[];
+  systemStats: {
+    totalDocks: number;
+    activePromotions: number;
+    todayAuditLogs: number;
+  };
+  totalBookingsThisMonth: number;
+}
+
 export default function AdminDashboard() {
-  const maxBar = Math.max(...REV_BARS);
+  const [data, setData] = useState<DashboardStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    Api.get('/admin/dashboard/stats')
+      .then((res) => {
+        if (active && res.status === 200 && res.data?.code === 1000) {
+          setData(res.data.result);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch dashboard stats:', err);
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[85vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2
+            className="h-10 w-10 animate-spin"
+            style={{ color: ACCENT }}
+          />
+          <p className="text-sm font-medium" style={{ color: '#8892a0' }}>
+            Đang tải dữ liệu hệ thống...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex h-[85vh] flex-col items-center justify-center gap-2">
+        <p className="text-sm text-red-500">
+          Đã xảy ra lỗi khi kết nối máy chủ.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="rounded-lg px-4 py-2 text-sm font-semibold transition-colors hover:bg-white/5 border border-white/10"
+          style={{ color: '#fff' }}
+        >
+          Tải lại trang
+        </button>
+      </div>
+    );
+  }
+
+  const maxBar = Math.max(...data.revenueBars, 1);
+
   return (
     <div className="px-4 py-6 lg:px-8 space-y-6">
       {/* Header */}
@@ -200,39 +179,42 @@ export default function AdminDashboard() {
 
       {/* KPI */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {STATS.map((s) => (
-          <div
-            key={s.label}
-            className="rounded-2xl p-5 transition-all hover:scale-[1.02]"
-            style={CARD}
-          >
-            <div className="flex items-start justify-between">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{ backgroundColor: s.bg }}
-              >
-                <s.icon size={20} style={{ color: s.color }} />
+        {data.stats.map((s) => {
+          const Icon = iconMap[s.label] || Users;
+          return (
+            <div
+              key={s.label}
+              className="rounded-2xl p-5 transition-all hover:scale-[1.02]"
+              style={CARD}
+            >
+              <div className="flex items-start justify-between">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: s.bg }}
+                >
+                  <Icon size={20} style={{ color: s.color }} />
+                </div>
+                <span
+                  className="flex items-center gap-1 text-xs font-semibold"
+                  style={{ color: s.up ? '#10B981' : '#EF4444' }}
+                >
+                  {s.up ? (
+                    <ArrowUpRight size={13} />
+                  ) : (
+                    <ArrowDownRight size={13} />
+                  )}
+                  {s.change}
+                </span>
               </div>
-              <span
-                className="flex items-center gap-1 text-xs font-semibold"
-                style={{ color: s.up ? '#10B981' : '#EF4444' }}
-              >
-                {s.up ? (
-                  <ArrowUpRight size={13} />
-                ) : (
-                  <ArrowDownRight size={13} />
-                )}
-                {s.change}
-              </span>
+              <p className="mt-4 text-2xl font-bold" style={{ color: '#fff' }}>
+                {s.value}
+              </p>
+              <p className="mt-0.5 text-xs" style={{ color: '#8892a0' }}>
+                {s.label}
+              </p>
             </div>
-            <p className="mt-4 text-2xl font-bold" style={{ color: '#fff' }}>
-              {s.value}
-            </p>
-            <p className="mt-0.5 text-xs" style={{ color: '#8892a0' }}>
-              {s.label}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Revenue + Booking Status */}
@@ -256,7 +238,7 @@ export default function AdminDashboard() {
             </Link>
           </div>
           <div className="flex items-end gap-2 h-40">
-            {REV_BARS.map((val, i) => (
+            {data.revenueBars.map((val, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
                 <div
                   className="w-full rounded-t-md hover:opacity-80 transition-all"
@@ -264,13 +246,13 @@ export default function AdminDashboard() {
                     height: `${(val / maxBar) * 100}%`,
                     minHeight: 4,
                     background:
-                      i === REV_BARS.length - 1
+                      i === data.revenueBars.length - 1
                         ? `linear-gradient(180deg,${ACCENT},#c00030)`
                         : 'rgba(255,56,92,0.3)',
                   }}
                 />
                 <span className="text-[9px]" style={{ color: '#8892a0' }}>
-                  {MONTHS[i]}
+                  {data.months[i]}
                 </span>
               </div>
             ))}
@@ -282,10 +264,10 @@ export default function AdminDashboard() {
             Trạng thái Booking
           </h2>
           <p className="text-xs mt-0.5 mb-5" style={{ color: '#8892a0' }}>
-            Tháng hiện tại · 481 bookings
+            Tháng hiện tại · {data.totalBookingsThisMonth} bookings
           </p>
           <div className="space-y-4">
-            {BOOKING_STATUS.map((item) => (
+            {data.bookingStatus.map((item) => (
               <div key={item.label}>
                 <div className="flex justify-between mb-1.5">
                   <span
@@ -337,8 +319,8 @@ export default function AdminDashboard() {
               Xem tất cả →
             </Link>
           </div>
-          {RECENT.map((bk) => {
-            const st = ST_MAP[bk.status];
+          {data.recentBookings.map((bk) => {
+            const st = ST_MAP[bk.status] || ST_MAP.pending;
             return (
               <div
                 key={bk.id}
@@ -406,40 +388,49 @@ export default function AdminDashboard() {
             </Link>
           </div>
           <div className="p-4 space-y-3">
-            {PENDING_VERIFY.map((v, i) => (
-              <div
-                key={i}
-                className="rounded-xl p-4 space-y-2 hover:scale-[1.01] transition-all"
-                style={{
-                  backgroundColor: 'rgba(255,56,92,0.06)',
-                  border: '1px solid rgba(255,56,92,0.12)',
-                }}
+            {data.pendingVerify.length === 0 ? (
+              <p
+                className="text-xs text-center py-8"
+                style={{ color: '#8892a0' }}
               >
-                <div className="flex items-start gap-2">
-                  <ShieldCheck
-                    size={14}
-                    style={{ color: ACCENT, flexShrink: 0, marginTop: 2 }}
-                  />
-                  <p
-                    className="text-xs font-semibold leading-tight"
-                    style={{ color: '#fff' }}
-                  >
-                    {v.name}
-                  </p>
+                Không có yêu cầu xác thực nào.
+              </p>
+            ) : (
+              data.pendingVerify.map((v, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl p-4 space-y-2 hover:scale-[1.01] transition-all"
+                  style={{
+                    backgroundColor: 'rgba(255,56,92,0.06)',
+                    border: '1px solid rgba(255,56,92,0.12)',
+                  }}
+                >
+                  <div className="flex items-start gap-2">
+                    <ShieldCheck
+                      size={14}
+                      style={{ color: ACCENT, flexShrink: 0, marginTop: 2 }}
+                    />
+                    <p
+                      className="text-xs font-semibold leading-tight"
+                      style={{ color: '#fff' }}
+                    >
+                      {v.name}
+                    </p>
+                  </div>
+                  <div className="flex justify-between">
+                    <span
+                      className="text-[10px] font-mono"
+                      style={{ color: '#8892a0' }}
+                    >
+                      {v.license}
+                    </span>
+                    <span className="text-[10px]" style={{ color: '#8892a0' }}>
+                      {v.ago}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span
-                    className="text-[10px] font-mono"
-                    style={{ color: '#8892a0' }}
-                  >
-                    {v.license}
-                  </span>
-                  <span className="text-[10px]" style={{ color: '#8892a0' }}>
-                    {v.ago}
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
           <div
             className="px-6 pb-5 pt-2 border-t space-y-3"
@@ -452,11 +443,19 @@ export default function AdminDashboard() {
               Hệ thống
             </p>
             {[
-              { label: 'Tổng bến tàu', value: '12', icon: Anchor },
-              { label: 'Mã KM đang active', value: '5', icon: Star },
+              {
+                label: 'Tổng bến tàu',
+                value: data.systemStats.totalDocks.toString(),
+                icon: Anchor,
+              },
+              {
+                label: 'Mã KM đang active',
+                value: data.systemStats.activePromotions.toString(),
+                icon: Star,
+              },
               {
                 label: 'Log kiểm toán hôm nay',
-                value: '138',
+                value: data.systemStats.todayAuditLogs.toString(),
                 icon: AlertCircle,
               },
             ].map((item) => (

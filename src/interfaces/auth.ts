@@ -13,9 +13,11 @@ export interface IRegisterPayload {
 }
 
 export interface ILoginRes {
+  token: string;
   accessToken: string;
   refreshToken: string;
-  user: User;
+  authenticated: boolean;
+  expiresInSeconds: number;
 }
 
 export interface IRegisterRes {

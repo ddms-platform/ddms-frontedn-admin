@@ -10,6 +10,7 @@ import {
   adminSecondaryLinks,
   adminLogoutLink,
 } from '@/data/admin-sidelinks';
+import { useTranslation } from 'react-i18next';
 
 /* Admin accent: Rausch Red — highest authority colour in the design system */
 const ACCENT = '#FF385C';
@@ -20,6 +21,7 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useTranslation();
 
   const initials = user?.name
     ? user.name
@@ -128,15 +130,7 @@ export default function AdminLayout() {
                   })}
                 >
                   <span className="shrink-0">{link.icon}</span>
-                  {!collapsed && (
-                    <span>
-                      {link.title
-                        .split('.')
-                        .pop()
-                        ?.replace(/([A-Z])/g, ' $1')
-                        .trim()}
-                    </span>
-                  )}
+                  {!collapsed && <span>{t(link.title)}</span>}
                 </NavLink>
               </li>
             ))}
@@ -157,7 +151,7 @@ export default function AdminLayout() {
                   style={{ color: '#c8d0e0' }}
                 >
                   <span className="shrink-0">{link.icon}</span>
-                  {!collapsed && <span>Về trang chính</span>}
+                  {!collapsed && <span>{t(link.title)}</span>}
                 </Link>
               </li>
             ))}
@@ -168,7 +162,7 @@ export default function AdminLayout() {
                 style={{ color: '#EF4444' }}
               >
                 <span className="shrink-0">{adminLogoutLink.icon}</span>
-                {!collapsed && <span>Đăng xuất</span>}
+                {!collapsed && <span>{t(adminLogoutLink.title)}</span>}
               </button>
             </li>
           </ul>
@@ -231,8 +225,8 @@ export default function AdminLayout() {
               <img
                 src={user.avatar_url}
                 alt={user.name}
-                className="h-9 w-9 rounded-full object-cover ring-2"
-                style={{ ringColor: ACCENT }}
+                className="h-9 w-9 rounded-full object-cover border-2"
+                style={{ borderColor: ACCENT }}
               />
             ) : (
               <div

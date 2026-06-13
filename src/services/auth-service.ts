@@ -1,6 +1,5 @@
 import { Api, Axios } from './axios';
 import { routeName } from '@/constants/route-name';
-import { env } from '@/config/env';
 import { localStorageService } from './local-storage-service';
 import type { IProfileRes } from '@/interfaces/profile';
 import type {
@@ -15,38 +14,45 @@ import type {
   IRefreshTokenRes,
 } from '@/interfaces/auth';
 
-const resource = env.API_URL_PREFIX;
+export interface ApiResponse<T> {
+  code: number;
+  result: T;
+  message?: string;
+}
 
 const login = (payload: ILoginPayload) => {
-  return Axios.post<ILoginRes>(`${resource}/login`, payload);
+  return Axios.post<ApiResponse<ILoginRes>>('/auth/login', payload);
 };
 
 const register = (payload: IRegisterPayload) => {
-  return Axios.post<IRegisterRes>(`${resource}/register`, payload);
+  return Axios.post<ApiResponse<IRegisterRes>>('/auth/register', payload);
 };
 
 const forgotPassword = (payload: IForgotPasswordPayload) => {
-  return Axios.post(`${resource}/forgot-password`, payload);
+  return Axios.post('/auth/forgot-password', payload);
 };
 
 const resetPassword = (payload: IResetPasswordPayload) => {
-  return Axios.post(`${resource}/reset-password`, payload);
+  return Axios.post('/auth/reset-password', payload);
 };
 
 const refreshToken = (payload: IRefreshTokenPayload) => {
-  return Axios.post<IRefreshTokenRes>(`${resource}/refresh-token`, payload);
+  return Axios.post<ApiResponse<IRefreshTokenRes>>(
+    '/auth/refresh-token',
+    payload,
+  );
 };
 
 const getProfile = () => {
-  return Api.get<IProfileRes>(`${resource}/me`);
+  return Api.get<ApiResponse<IProfileRes>>('/auth/me');
 };
 
 const changePassword = (payload: IChangePasswordPayload) => {
-  return Api.post(`${resource}/change-password`, payload);
+  return Api.post('/auth/change-password', payload);
 };
 
 const logout = () => {
-  return Api.post(`${resource}/logout`).finally(() => {
+  return Api.post('/auth/logout').finally(() => {
     localStorageService.clearAccessToken();
     window.location.href = routeName.signIn;
   });

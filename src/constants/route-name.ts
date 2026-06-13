@@ -26,6 +26,7 @@ export const routeName = Object.freeze({
   ownerTours: '/owner/tours',
   ownerBookings: '/owner/bookings',
   ownerProfile: '/owner/profile',
+  ownerPromotions: '/owner/promotions',
 
   // Admin
   admin: '/admin',
@@ -40,6 +41,7 @@ export const routeName = Object.freeze({
   adminFaqs: '/admin/faqs',
   adminNotifications: '/admin/notifications',
   adminAuditLogs: '/admin/audit-logs',
+  adminApprovals: '/admin/approvals',
 
   // System
   maintenance: '/maintenance',

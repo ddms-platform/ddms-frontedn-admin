@@ -79,4 +79,37 @@ export const dockApi = {
 
   delete: (id: string) =>
     Api.del<ApiResponse<{ deleted: boolean }>>(`/admin/docks/${id}`),
+
+  getSchedules: (dockId: string) =>
+    Api.get<ApiResponse<DockScheduleResponse[]>>(
+      `/admin/docks/${dockId}/schedules`,
+    ),
+
+  addSchedule: (dockId: string, data: CreateDockScheduleRequest) =>
+    Api.post<ApiResponse<DockScheduleResponse>>(
+      `/admin/docks/${dockId}/schedules`,
+      data,
+    ),
+
+  deleteSchedule: (dockId: string, scheduleId: string) =>
+    Api.del<ApiResponse<{ deleted: boolean }>>(
+      `/admin/docks/${dockId}/schedules/${scheduleId}`,
+    ),
 };
+
+export interface DockScheduleResponse {
+  id: string;
+  dockId: string;
+  boatId: string;
+  boatName: string;
+  scheduleId?: string;
+  startTime: string;
+  endTime: string;
+  createdAt: string;
+}
+
+export interface CreateDockScheduleRequest {
+  boatId: string;
+  startTime: string;
+  endTime: string;
+}

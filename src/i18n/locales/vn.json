@@ -1,4 +1,4 @@
-﻿{
+{
   "auth": {
     "signIn": {
       "title": "Chào mừng trở lại",
@@ -556,7 +556,8 @@
       "reviews": "Đánh giá",
       "faqs": "Hỏi đáp",
       "notifications": "Thông báo",
-      "auditLogs": "Nhật ký hệ thống"
+      "auditLogs": "Nhật ký hệ thống",
+      "approvals": "Bảo trì và Hoàn tiền"
     }
   },
   "ownerLayout": {
@@ -566,7 +567,8 @@
       "boats": "Quản lý Thuyền",
       "tours": "Quản lý Tour",
       "bookings": "Booking",
-      "profile": "Hồ sơ doanh nghiệp"
+      "profile": "Hồ sơ doanh nghiệp",
+      "promotions": "Quản lý Khuyến mãi"
     },
     "backHome": "Về trang chủ",
     "logout": "Đăng xuất",
