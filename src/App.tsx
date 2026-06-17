@@ -9,6 +9,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { routeName } from '@/constants/route-name';
+import { Toaster } from '@/components/ui/sonner';
 
 const SignInPage = lazy(() => import('@/pages/auth/sign-in'));
 const SignUpPage = lazy(() => import('@/pages/auth/sign-up'));
@@ -30,9 +31,11 @@ const AdminNotifications = lazy(
   () => import('@/pages/admin/notifications/index'),
 );
 const AdminAuditLogs = lazy(() => import('@/pages/admin/audit-logs/index'));
+const AdminApprovals = lazy(() => import('@/pages/admin/approvals/index'));
 
 // ── Owner pages ──────────────────────────────────────────────────────────────
 const OwnerBoats = lazy(() => import('@/pages/owner/boats/index'));
+const OwnerPromotions = lazy(() => import('@/pages/owner/promotions/index'));
 
 function PageLoader() {
   return <LoadingSpinner fullScreen />;
@@ -44,6 +47,7 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <LanguageProvider>
+            <Toaster position="top-right" richColors closeButton />
             <Routes>
               {/* Auth Routes - own layout, no header/footer */}
               <Route element={<AuthLayout />}>
@@ -164,6 +168,14 @@ function App() {
                       </Suspense>
                     }
                   />
+                  <Route
+                    path={routeName.adminApprovals}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminApprovals />
+                      </Suspense>
+                    }
+                  />
                 </Route>
               </Route>
 
@@ -175,6 +187,14 @@ function App() {
                     element={
                       <Suspense fallback={<PageLoader />}>
                         <OwnerBoats />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.ownerPromotions}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <OwnerPromotions />
                       </Suspense>
                     }
                   />

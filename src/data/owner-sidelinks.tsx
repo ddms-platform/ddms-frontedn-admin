@@ -6,6 +6,7 @@ import {
   User,
   Home,
   LogOut,
+  Tag,
 } from 'lucide-react';
 import type { JSX } from 'react';
 import { routeName } from '@/constants/route-name';
@@ -52,6 +53,11 @@ export const ownerSidelinks: SideLink[] = [
     title: 'ownerLayout.nav.profile',
     href: routeName.ownerProfile,
     icon: <User size={20} />,
+  },
+  {
+    title: 'ownerLayout.nav.promotions',
+    href: routeName.ownerPromotions,
+    icon: <Tag size={20} />,
   },
 ];
 

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Ship,
   Plus,
@@ -7,19 +7,14 @@ import {
   X,
   Edit2,
   Trash2,
-  Eye,
   ChevronDown,
   Wrench,
   CheckCircle,
   Clock,
   BedDouble,
   Waves,
-  ArrowUpRight,
-  ArrowDownRight,
   ImageIcon,
-  DollarSign,
   Users,
-  Anchor,
   Save,
   AlertTriangle,
   ToggleLeft,
@@ -29,12 +24,11 @@ import {
 import toast from 'react-hot-toast';
 import {
   boatApi,
-  BoatDetailResponse,
-  BoatListItemResponse,
-  BoatCabinResponse,
-  BoatServiceResponse,
-  BoatImageResponse,
-  BoatStatsResponse,
+  type BoatDetailResponse,
+  type BoatListItemResponse,
+  type BoatCabinResponse,
+  type BoatServiceResponse,
+  type BoatStatsResponse,
 } from '@/services/boat-api';
 
 /* ─────────────────────── Design tokens ─────────────────────── */
@@ -56,15 +50,6 @@ const BOAT_TYPE_LABELS: Record<BoatType, string> = {
   party: 'Thuyền tiệc',
   speedboat: 'Ca nô',
 };
-
-const DOCKS = [
-  'Bến Tuần Châu',
-  'Bến Cát Bà',
-  'Bến Bạch Đằng',
-  'Bến Nha Trang',
-  'Bến Cần Thơ',
-  'Bến Phú Quốc',
-];
 
 /* ─────────────────────── Sub-components ─────────────────────── */
 

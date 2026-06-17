@@ -10,6 +10,7 @@ import {
   ownerSecondaryLinks,
   ownerLogoutLink,
 } from '@/data/owner-sidelinks';
+import { useTranslation } from 'react-i18next';
 
 /* Owner accent: Brand Blue for differentiation */
 const ACCENT = '#3B82F6';
@@ -20,6 +21,7 @@ export default function OwnerLayout() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useTranslation();
 
   const initials = user?.name
     ? user.name
@@ -128,15 +130,7 @@ export default function OwnerLayout() {
                   })}
                 >
                   <span className="shrink-0">{link.icon}</span>
-                  {!collapsed && (
-                    <span>
-                      {link.title
-                        .split('.')
-                        .pop()
-                        ?.replace(/([A-Z])/g, ' $1')
-                        .trim()}
-                    </span>
-                  )}
+                  {!collapsed && <span>{t(link.title)}</span>}
                 </NavLink>
               </li>
             ))}
@@ -157,7 +151,7 @@ export default function OwnerLayout() {
                   style={{ color: '#c8d0e0' }}
                 >
                   <span className="shrink-0">{link.icon}</span>
-                  {!collapsed && <span>Về trang chính</span>}
+                  {!collapsed && <span>{t(link.title)}</span>}
                 </Link>
               </li>
             ))}
@@ -168,7 +162,7 @@ export default function OwnerLayout() {
                 style={{ color: '#EF4444' }}
               >
                 <span className="shrink-0">{ownerLogoutLink.icon}</span>
-                {!collapsed && <span>Đăng xuất</span>}
+                {!collapsed && <span>{t(ownerLogoutLink.title)}</span>}
               </button>
             </li>
           </ul>
@@ -231,8 +225,8 @@ export default function OwnerLayout() {
               <img
                 src={user.avatar_url}
                 alt={user.name}
-                className="h-9 w-9 rounded-full object-cover ring-2"
-                style={{ ringColor: ACCENT }}
+                className="h-9 w-9 rounded-full object-cover border-2"
+                style={{ borderColor: ACCENT }}
               />
             ) : (
               <div

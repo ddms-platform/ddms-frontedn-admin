@@ -6,8 +6,12 @@ import { Button } from '@/components/ui/button';
 import { useFormValidation, rules } from '@/hooks/use-form-validation';
 import FormField from '@/components/shared/form-field';
 import { useAuth } from '@/hooks/use-auth';
-import { GoogleIcon } from '@/components/shared/google-icon';
 import { routeName } from '@/constants/route-name';
+import { AuthServices } from '@/services/auth-service';
+import { toast } from 'sonner';
+import { localStorageService } from '@/services/local-storage-service';
+import { localStorageKey } from '@/constants/local-storage';
+import type { UserRole } from '@/data/user';
 import logo from '@/assets/logo.png';
 
 export default function SignInPage() {
@@ -34,18 +38,55 @@ export default function SignInPage() {
     if (!validateAll()) return;
 
     setIsLoading(true);
-    // TODO: Replace with real API call
-    setTimeout(() => {
-      // Mock login — save token + user info via AuthContext
-      const isAdmin = emailProps.value.toLowerCase().includes('admin');
-      login('mock-jwt-token', {
-        name: isAdmin ? 'Admin User' : 'Nguyễn Văn A',
+    try {
+      const res = await AuthServices.login({
         email: emailProps.value,
-        roles: isAdmin ? ['admin'] : ['owner'],
+        password: passwordProps.value,
       });
+
+      if (res.status === 200 && res.data?.code === 1000) {
+        const tokens = res.data.result;
+        if (!tokens || !tokens.token) {
+          toast.error(t('auth.signIn.error'));
+          return;
+        }
+
+        // Save token to localStorage for axios authorization header
+        localStorageService.setItem(localStorageKey.ACCESS_TOKEN, tokens.token);
+
+        // Fetch profile
+        const profileRes = await AuthServices.getProfile();
+        if (profileRes.status === 200 && profileRes.data?.code === 1000) {
+          const profile = profileRes.data.result;
+          if (profile) {
+            const isAdmin = profile.roles.includes('admin');
+            if (!isAdmin) {
+              localStorageService.clearAccessToken();
+              toast.error('Tài khoản không có quyền truy cập trang quản trị!');
+              return;
+            }
+
+            // Perform context login
+            login(tokens.token, {
+              name: profile.fullName,
+              email: profile.email,
+              roles: profile.roles as UserRole[],
+              avatar_url: profile.avatarUrl || undefined,
+            });
+
+            toast.success(t('auth.signIn.success'));
+            navigate(from, { replace: true });
+            return;
+          }
+        }
+      }
+      toast.error(t('auth.signIn.error'));
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || t('auth.signIn.error');
+      toast.error(msg);
+    } finally {
       setIsLoading(false);
-      navigate(from, { replace: true });
-    }, 1500);
+    }
   };
 
   const emailProps = getFieldProps('email');
@@ -132,45 +173,6 @@ export default function SignInPage() {
           )}
         </Button>
       </form>
-
-      {/* Divider */}
-      <div className="relative flex items-center">
-        <div
-          className="flex-1"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
-        />
-        <span className="px-4 text-xs font-medium" style={{ color: '#ecf0ff' }}>
-          {t('auth.signIn.orContinueWith')}
-        </span>
-        <div
-          className="flex-1"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
-        />
-      </div>
-
-      {/* Social Login */}
-      <div className="flex flex-col gap-3">
-        <Button
-          type="button"
-          variant="dark-outline"
-          className="h-11 w-full gap-2"
-        >
-          <GoogleIcon />
-          Google
-        </Button>
-      </div>
-
-      {/* Sign-up Link */}
-      <p className="text-center text-sm" style={{ color: '#ecf0ff' }}>
-        {t('auth.signIn.dontHaveAccount')}?{' '}
-        <Link
-          to={routeName.signUp}
-          className="font-semibold transition-colors hover:underline"
-          style={{ color: '#00F0FF' }}
-        >
-          {t('auth.signIn.signUpLink')}
-        </Link>
-      </p>
     </div>
   );
 }

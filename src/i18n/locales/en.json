@@ -1,4 +1,4 @@
-﻿{
+{
   "auth": {
     "signIn": {
       "title": "Welcome back",
@@ -556,7 +556,8 @@
       "reviews": "Reviews",
       "faqs": "FAQs",
       "notifications": "Notifications",
-      "auditLogs": "Audit Logs"
+      "auditLogs": "Audit Logs",
+      "approvals": "Approvals"
     }
   },
   "ownerLayout": {
@@ -566,7 +567,8 @@
       "boats": "Boat Management",
       "tours": "Tour Management",
       "bookings": "Bookings",
-      "profile": "Business Profile"
+      "profile": "Business Profile",
+      "promotions": "Promotions"
     },
     "backHome": "Back to home",
     "logout": "Sign out",

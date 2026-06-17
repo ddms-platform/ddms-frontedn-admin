@@ -27,7 +27,7 @@ export interface ResponseBase<T = any> {
 }
 
 export interface DataResponseErrorBase {
-  code: string;
+  code: string | number;
   errors?: Error422[];
 }
 
@@ -86,14 +86,18 @@ api.interceptors.response.use(
           showUserDisabledDialog();
         } else {
           toast.error(i18n.t('error.USER_DISABLED'));
-          localStorageService.setItem(localStorageKey.ACCESS_TOKEN, null);
-          window.location.href = routeName.home;
+          localStorage.removeItem('token');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+          window.location.href = routeName.signIn;
         }
         return;
       }
 
-      window.location.href = routeName.home;
-      localStorageService.setItem(localStorageKey.ACCESS_TOKEN, null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      window.location.href = routeName.signIn;
     }
     return error.response;
   },

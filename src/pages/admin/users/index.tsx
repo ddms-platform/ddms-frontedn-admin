@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search,
-  Plus,
   MoreVertical,
   Shield,
   User,
   Crown,
   Trash2,
-  Edit2,
+  Loader2,
+  X,
 } from 'lucide-react';
+import { Api } from '@/services/axios';
+import { toast } from 'sonner';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -42,85 +44,128 @@ const ROLE_MAP: Record<
   },
 };
 
-const USERS = [
-  {
-    id: 1,
-    name: 'Nguyễn Văn A',
-    email: 'nguyenvana@email.com',
-    roles: ['admin'] as Role[],
-    joined: '01/01/2025',
-    verified: true,
-  },
-  {
-    id: 2,
-    name: 'Trần Thị B',
-    email: 'tranthib@email.com',
-    roles: ['owner'] as Role[],
-    joined: '15/02/2025',
-    verified: true,
-  },
-  {
-    id: 3,
-    name: 'Lê Hoàng C',
-    email: 'lehoangc@email.com',
-    roles: ['user'] as Role[],
-    joined: '10/03/2025',
-    verified: false,
-  },
-  {
-    id: 4,
-    name: 'Phạm Thùy D',
-    email: 'phamthuyd@email.com',
-    roles: ['user', 'owner'] as Role[],
-    joined: '22/03/2025',
-    verified: true,
-  },
-  {
-    id: 5,
-    name: 'Hoàng Minh E',
-    email: 'hoangminhe@email.com',
-    roles: ['user'] as Role[],
-    joined: '05/04/2025',
-    verified: true,
-  },
-  {
-    id: 6,
-    name: 'Võ Thanh F',
-    email: 'vothanhf@email.com',
-    roles: ['user'] as Role[],
-    joined: '18/04/2025',
-    verified: false,
-  },
-  {
-    id: 7,
-    name: 'Đỗ Quang G',
-    email: 'doquangg@email.com',
-    roles: ['owner'] as Role[],
-    joined: '01/05/2025',
-    verified: true,
-  },
-  {
-    id: 8,
-    name: 'Bùi Lan H',
-    email: 'builanh@email.com',
-    roles: ['user'] as Role[],
-    joined: '12/05/2025',
-    verified: false,
-  },
-];
+interface UserData {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  roles: Role[];
+  isActive: boolean;
+  emailVerified: boolean;
+  ownerVerified: boolean;
+  createdAt: string;
+}
 
 export default function AdminUsers() {
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | Role>('all');
-  const [activeMenu, setActiveMenu] = useState<number | null>(null);
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
-  const filtered = USERS.filter((u) => {
+  // Role Assignment states
+  const [showRolesModal, setShowRolesModal] = useState(false);
+  const [targetUser, setTargetUser] = useState<UserData | null>(null);
+  const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
+  const [isUpdatingRoles, setIsUpdatingRoles] = useState(false);
+
+  const fetchUsers = () => {
+    setIsLoading(true);
+    Api.get('/admin/users', { params: { pageSize: 1000 } })
+      .then((res) => {
+        if (res.status === 200 && res.data?.code === 1000) {
+          setUsers(res.data.result.items || []);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch admin users:', err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleToggleActive = async (user: UserData) => {
+    const actionText = user.isActive ? 'khóa' : 'mở khóa';
+    if (confirm(`Bạn có chắc chắn muốn ${actionText} tài khoản này?`)) {
+      try {
+        let res;
+        if (user.isActive) {
+          res = await Api.del(`/admin/users/${user.id}`);
+        } else {
+          res = await Api.put(`/admin/users/${user.id}`, {
+            fullName: user.fullName,
+            phone: user.phone || '',
+            isActive: true,
+          });
+        }
+
+        if (res.status === 200) {
+          toast.success(`Đã ${actionText} tài khoản thành công!`);
+          fetchUsers();
+        } else {
+          toast.error(`Có lỗi xảy ra khi ${actionText} tài khoản.`);
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error(`Có lỗi xảy ra khi ${actionText} tài khoản.`);
+      }
+    }
+  };
+
+  const handleUpdateRoles = async () => {
+    if (!targetUser) return;
+    if (selectedRoles.length === 0) {
+      toast.error('Vui lòng chọn ít nhất một vai trò');
+      return;
+    }
+    setIsUpdatingRoles(true);
+    try {
+      const res = await Api.put(`/admin/users/${targetUser.id}/roles`, {
+        roles: selectedRoles,
+      });
+      if (res.status === 200) {
+        toast.success('Cập nhật quyền thành công!');
+        setShowRolesModal(false);
+        fetchUsers();
+      } else {
+        toast.error('Có lỗi xảy ra khi cập nhật quyền.');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Có lỗi xảy ra khi cập nhật quyền.');
+    } finally {
+      setIsUpdatingRoles(false);
+    }
+  };
+
+  const filtered = users.filter((u) => {
     const matchSearch =
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase());
+      (u.fullName || '').toLowerCase().includes(search.toLowerCase()) ||
+      (u.email || '').toLowerCase().includes(search.toLowerCase());
     const matchRole = filterRole === 'all' || u.roles.includes(filterRole);
     return matchSearch && matchRole;
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[85vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2
+            className="h-10 w-10 animate-spin"
+            style={{ color: ACCENT }}
+          />
+          <p className="text-sm font-medium" style={{ color: '#8892a0' }}>
+            Đang tải danh sách người dùng...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-6 lg:px-8 space-y-6">
@@ -133,22 +178,16 @@ export default function AdminUsers() {
             Quản lý người dùng
           </h1>
           <p className="mt-1 text-sm" style={{ color: '#8892a0' }}>
-            Quản lý tài khoản và phân quyền · {USERS.length} người dùng
+            Quản lý tài khoản và phân quyền · {users.length} người dùng
           </p>
         </div>
-        <button
-          className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-95"
-          style={{ backgroundColor: ACCENT, color: '#fff' }}
-        >
-          <Plus size={16} /> Thêm người dùng
-        </button>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4">
         {(['admin', 'owner', 'user'] as Role[]).map((role) => {
           const info = ROLE_MAP[role];
-          const count = USERS.filter((u) => u.roles.includes(role)).length;
+          const count = users.filter((u) => u.roles.includes(role)).length;
           return (
             <div
               key={role}
@@ -260,7 +299,7 @@ export default function AdminUsers() {
                           color: '#fff',
                         }}
                       >
-                        {u.name
+                        {(u.fullName || '')
                           .split(' ')
                           .map((w) => w[0])
                           .join('')
@@ -268,7 +307,7 @@ export default function AdminUsers() {
                       </div>
                       <div>
                         <p className="font-semibold" style={{ color: '#fff' }}>
-                          {u.name}
+                          {u.fullName}
                         </p>
                         <p className="text-xs" style={{ color: '#8892a0' }}>
                           {u.email}
@@ -300,25 +339,35 @@ export default function AdminUsers() {
                     className="px-6 py-4 text-sm"
                     style={{ color: '#8892a0' }}
                   >
-                    {u.joined}
+                    {new Date(u.createdAt).toLocaleDateString('vi-VN')}
                   </td>
                   <td className="px-6 py-4">
-                    <span
-                      className="rounded-lg px-2.5 py-1 text-xs font-semibold"
-                      style={
-                        u.verified
-                          ? {
-                              backgroundColor: 'rgba(16,185,129,0.12)',
-                              color: '#10B981',
-                            }
-                          : {
-                              backgroundColor: 'rgba(245,158,11,0.12)',
-                              color: '#F59E0B',
-                            }
-                      }
-                    >
-                      {u.verified ? 'Đã xác thực' : 'Chưa xác thực'}
-                    </span>
+                    <div className="flex flex-col gap-1.5 items-start">
+                      <span
+                        className="rounded-lg px-2.5 py-1 text-[10px] font-semibold"
+                        style={
+                          u.isActive
+                            ? {
+                                backgroundColor: 'rgba(16,185,129,0.12)',
+                                color: '#10B981',
+                              }
+                            : {
+                                backgroundColor: 'rgba(239,68,68,0.12)',
+                                color: '#EF4444',
+                              }
+                        }
+                      >
+                        {u.isActive ? 'Hoạt động' : 'Đã khóa'}
+                      </span>
+                      <span
+                        className="text-[9px] font-medium"
+                        style={{
+                          color: u.emailVerified ? '#10B981' : '#F59E0B',
+                        }}
+                      >
+                        {u.emailVerified ? '• Đã xác thực' : '• Chưa xác thực'}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="relative">
@@ -340,22 +389,31 @@ export default function AdminUsers() {
                           }}
                         >
                           <button
-                            className="flex w-full items-center gap-2 px-4 py-2.5 text-sm hover:bg-white/5 transition-colors"
-                            style={{ color: '#c8d0e0' }}
-                          >
-                            <Edit2 size={14} /> Chỉnh sửa
-                          </button>
-                          <button
+                            onClick={() => {
+                              setTargetUser(u);
+                              setSelectedRoles(u.roles);
+                              setShowRolesModal(true);
+                              setActiveMenu(null);
+                            }}
                             className="flex w-full items-center gap-2 px-4 py-2.5 text-sm hover:bg-white/5 transition-colors"
                             style={{ color: '#F59E0B' }}
                           >
                             <Shield size={14} /> Phân quyền
                           </button>
                           <button
+                            onClick={() => {
+                              handleToggleActive(u);
+                              setActiveMenu(null);
+                            }}
                             className="flex w-full items-center gap-2 px-4 py-2.5 text-sm hover:bg-white/5 transition-colors"
-                            style={{ color: '#EF4444' }}
+                            style={{
+                              color: u.isActive ? '#EF4444' : '#10B981',
+                            }}
                           >
-                            <Trash2 size={14} /> Xóa tài khoản
+                            <Trash2 size={14} />{' '}
+                            {u.isActive
+                              ? 'Khóa tài khoản'
+                              : 'Mở khóa tài khoản'}
                           </button>
                         </div>
                       )}
@@ -372,6 +430,103 @@ export default function AdminUsers() {
           </p>
         )}
       </div>
+
+      {/* Role Assignment Modal */}
+      {showRolesModal && targetUser && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowRolesModal(false)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="w-full max-w-sm rounded-2xl p-6 space-y-5 shadow-2xl z-50"
+              style={{
+                backgroundColor: '#141e35',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#fff',
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-base font-bold text-white">
+                  Phân quyền: {targetUser.fullName}
+                </p>
+                <button
+                  onClick={() => setShowRolesModal(false)}
+                  className="rounded-lg p-1.5 hover:bg-white/5 text-gray-400"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-xs text-gray-400">
+                  Chọn vai trò cho người dùng:
+                </p>
+                {(['admin', 'owner', 'user'] as Role[]).map((role) => {
+                  const isChecked = selectedRoles.includes(role);
+                  const info = ROLE_MAP[role];
+                  return (
+                    <label
+                      key={role}
+                      className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:bg-white/5 transition-all select-none"
+                      style={{
+                        borderColor: isChecked
+                          ? info.color
+                          : 'rgba(255,255,255,0.06)',
+                        backgroundColor: isChecked
+                          ? `${info.bg}`
+                          : 'transparent',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedRoles([...selectedRoles, role]);
+                          } else {
+                            setSelectedRoles(
+                              selectedRoles.filter((r) => r !== role),
+                            );
+                          }
+                        }}
+                        className="rounded border-gray-600 bg-gray-700 text-rose-500 focus:ring-rose-500"
+                      />
+                      <div className="flex items-center gap-2">
+                        <info.icon size={16} style={{ color: info.color }} />
+                        <span
+                          className="text-sm font-semibold capitalize"
+                          style={{ color: isChecked ? '#fff' : '#c8d0e0' }}
+                        >
+                          {info.label}
+                        </span>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleUpdateRoles}
+                  disabled={isUpdatingRoles}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold hover:opacity-90 active:scale-95 transition-all text-white bg-rose-500 disabled:opacity-50"
+                >
+                  {isUpdatingRoles ? 'Đang lưu...' : 'Lưu thay đổi'}
+                </button>
+                <button
+                  onClick={() => setShowRolesModal(false)}
+                  disabled={isUpdatingRoles}
+                  className="flex-1 rounded-xl py-2.5 text-sm font-semibold hover:bg-white/5 transition-all bg-slate-800 text-slate-300 border border-slate-700 disabled:opacity-50"
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
