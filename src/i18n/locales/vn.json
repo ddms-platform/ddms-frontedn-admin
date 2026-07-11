@@ -12,7 +12,9 @@
       "signingIn": "Đang đăng nhập...",
       "orContinueWith": "hoặc tiếp tục với",
       "dontHaveAccount": "Chưa có tài khoản",
-      "signUpLink": "Đăng ký"
+      "signUpLink": "Đăng ký",
+      "success": "Đăng nhập thành công",
+      "error": "Đăng nhập thất bại. Kiểm tra email và mật khẩu."
     },
     "signUp": {
       "title": "Tạo tài khoản",
@@ -557,7 +559,8 @@
       "faqs": "Hỏi đáp",
       "notifications": "Thông báo",
       "auditLogs": "Nhật ký hệ thống",
-      "approvals": "Bảo trì và Hoàn tiền"
+      "approvals": "Bảo trì và Hoàn tiền",
+      "legalCompliance": "Kiểm duyệt pháp lý"
     }
   },
   "ownerLayout": {
@@ -711,6 +714,75 @@
         "empty": "Chưa có lịch bảo trì nào.",
         "default": "Bảo trì"
       }
+    }
+  },
+  "adminOwnerVerification": {
+    "fields": {
+      "nationalId": "CCCD / Hộ chiếu",
+      "nationalIdNumber": "Số CCCD / Hộ chiếu",
+      "entityType": "Loại chủ thể"
+    },
+    "entityTypes": {
+      "individual": "Cá nhân",
+      "business": "Doanh nghiệp",
+      "cooperative": "Hợp tác xã"
+    },
+    "ownerDocuments": {
+      "title": "Giấy tờ chủ thuyền",
+      "hint": "Chỉ xem tham khảo — duyệt hoặc từ chối cả hồ sơ, không duyệt từng giấy tờ.",
+      "empty": "Chưa có giấy tờ chủ thuyền",
+      "view": "Xem",
+      "expiresOn": "Hết hạn: {{date}}",
+      "adminNote": "Ghi chú: {{note}}"
+    }
+  },
+  "certificateTypesManager": {
+    "title": "Danh mục loại giấy tờ",
+    "subtitle": "Các loại này hiện trong dropdown khi Owner upload giấy tờ thuyền / chủ thuyền",
+    "add": "Thêm loại",
+    "filterAll": "Tất cả phạm vi",
+    "scopes": {
+      "boat": "Thuyền",
+      "owner": "Chủ thuyền"
+    },
+    "formCreate": "Thêm loại mới",
+    "formEdit": "Sửa: {{code}}",
+    "fields": {
+      "code": "Mã (code) — không đổi sau khi tạo",
+      "nameVi": "Tên tiếng Việt",
+      "nameEn": "Tên tiếng Anh",
+      "scope": "Phạm vi",
+      "sortOrder": "Thứ tự"
+    },
+    "active": "Đang hiện",
+    "inactive": "Đã ẩn",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "empty": "Chưa có loại giấy tờ nào",
+    "columns": {
+      "code": "Mã",
+      "nameVi": "Tên VI",
+      "nameEn": "Tên EN",
+      "scope": "Phạm vi",
+      "sortOrder": "Thứ tự",
+      "status": "Trạng thái"
+    },
+    "statusVisible": "Hiện",
+    "statusHidden": "Ẩn",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "loadError": "Không thể tải danh sách loại giấy tờ",
+    "createSuccess": "Đã thêm loại giấy tờ",
+    "createError": "Không thể thêm loại giấy tờ",
+    "updateSuccess": "Đã cập nhật loại giấy tờ",
+    "updateError": "Không thể cập nhật loại giấy tờ",
+    "deleteSuccess": "Đã xóa / vô hiệu hóa loại giấy tờ",
+    "deleteError": "Không thể xóa loại giấy tờ",
+    "deleteConfirm": "Xóa loại \"{{name}}\"?\nNếu đã có giấy tờ dùng mã này, hệ thống sẽ chỉ vô hiệu hóa.",
+    "genericError": "Có lỗi xảy ra",
+    "validation": {
+      "namesRequired": "Vui lòng nhập tên tiếng Việt và tiếng Anh",
+      "codeRequired": "Vui lòng nhập mã loại giấy tờ"
     }
   }
 }

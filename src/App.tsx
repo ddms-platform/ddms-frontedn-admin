@@ -32,6 +32,9 @@ const AdminNotifications = lazy(
 );
 const AdminAuditLogs = lazy(() => import('@/pages/admin/audit-logs/index'));
 const AdminApprovals = lazy(() => import('@/pages/admin/approvals/index'));
+const AdminLegalCompliance = lazy(
+  () => import('@/pages/admin/legal-compliance/index'),
+);
 
 // ── Owner pages ──────────────────────────────────────────────────────────────
 const OwnerBoats = lazy(() => import('@/pages/owner/boats/index'));
@@ -173,6 +176,14 @@ function App() {
                     element={
                       <Suspense fallback={<PageLoader />}>
                         <AdminApprovals />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminLegalCompliance}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminLegalCompliance />
                       </Suspense>
                     }
                   />
