@@ -21,6 +21,7 @@ import type {
   CreatePromotionRequest,
 } from '@/services/promotions-api';
 import { toast } from 'sonner';
+import DateInput from '@/components/ui/date-input';
 
 const ACCENT = '#FF385C';
 const CARD: React.CSSProperties = {
@@ -788,14 +789,12 @@ export default function OwnerPromotions() {
                     <label className="block text-xs font-semibold mb-1.5 text-[#8892a0]">
                       Ngày bắt đầu *
                     </label>
-                    <input
-                      type="date"
+                    <DateInput
                       value={validFrom}
-                      onChange={(e) => setValidFrom(e.target.value)}
+                      onChange={setValidFrom}
                       required
                       min={getTodayDateString()}
                       className="w-full rounded-xl py-2.5 px-4 text-sm outline-none bg-white/5 border border-white/10 text-white focus:border-[#FF385C] transition-colors"
-                      style={{ colorScheme: 'dark' }}
                     />
                   </div>
 
@@ -803,17 +802,15 @@ export default function OwnerPromotions() {
                     <label className="block text-xs font-semibold mb-1.5 text-[#8892a0]">
                       Ngày kết thúc
                     </label>
-                    <input
-                      type="date"
+                    <DateInput
                       value={validUntil}
-                      onChange={(e) => setValidUntil(e.target.value)}
+                      onChange={setValidUntil}
                       min={
                         validFrom
                           ? getNextDateString(validFrom)
                           : getTodayDateString()
                       }
                       className="w-full rounded-xl py-2.5 px-4 text-sm outline-none bg-white/5 border border-white/10 text-white focus:border-[#FF385C] transition-colors"
-                      style={{ colorScheme: 'dark' }}
                     />
                   </div>
 

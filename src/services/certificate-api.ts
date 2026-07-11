@@ -5,15 +5,11 @@ export interface ApiResponse<T> {
   result: T;
 }
 
-export const CERTIFICATE_TYPES = [
-  'registration',
-  'insurance',
-  'business_license',
-  'safety_cert',
-  'other',
-] as const;
+export type CertificateType = string;
 
-export type CertificateType = (typeof CERTIFICATE_TYPES)[number];
+export type CertificateScope = 'boat' | 'owner';
+
+export type OwnerEntityType = 'individual' | 'business' | 'cooperative';
 
 export type CertificateStatus = 'pending' | 'approved' | 'rejected' | 'expired';
 
@@ -29,6 +25,18 @@ export interface CertificateListItem {
   expiryDate: string;
   status: CertificateStatus | string;
   rejectionReason?: string;
+  daysUntilExpiry?: number | null;
+  isExpiringSoon?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OwnerDocumentListItem {
+  id: string;
+  documentType: string;
+  documentUrl: string;
+  expiryDate?: string | null;
+  adminNote?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,6 +46,7 @@ export interface CertificateTypeItem {
   code: string;
   nameVi: string;
   nameEn: string;
+  scope?: CertificateScope | string;
   sortOrder: number;
   isActive: boolean;
 }
@@ -46,6 +55,7 @@ export interface CreateCertificateTypeRequest {
   code: string;
   nameVi: string;
   nameEn: string;
+  scope?: CertificateScope | string;
   sortOrder?: number;
   isActive?: boolean;
 }
@@ -53,29 +63,40 @@ export interface CreateCertificateTypeRequest {
 export interface UpdateCertificateTypeRequest {
   nameVi: string;
   nameEn: string;
+  scope?: CertificateScope | string;
   sortOrder: number;
   isActive: boolean;
 }
 
-/** Fallback labels when types API has not loaded yet */
-export const CERTIFICATE_TYPE_LABELS: Record<string, string> = {
-  registration: 'Đăng ký hàng hải',
-  insurance: 'Bảo hiểm',
-  business_license: 'Giấy phép kinh doanh',
-  safety_cert: 'Chứng nhận an toàn',
-  other: 'Khác',
-};
-
+/** Labels come from certificate_types API — do not hardcode names here. */
 export function buildTypeLabelMap(
   types: CertificateTypeItem[],
   locale: 'vi' | 'en' = 'vi',
 ): Record<string, string> {
-  const map: Record<string, string> = { ...CERTIFICATE_TYPE_LABELS };
+  const map: Record<string, string> = {};
   types.forEach((t) => {
     map[t.code] = locale === 'en' ? t.nameEn : t.nameVi;
   });
   return map;
 }
+
+export function typeLabel(
+  code: string,
+  labels?: Record<string, string> | null,
+): string {
+  return labels?.[code] || code;
+}
+
+export const OWNER_ENTITY_TYPE_LABELS: Record<string, string> = {
+  individual: 'Cá nhân',
+  business: 'Doanh nghiệp',
+  cooperative: 'Hợp tác xã',
+};
+
+export const CERTIFICATE_SCOPE_LABELS: Record<CertificateScope, string> = {
+  boat: 'Thuyền',
+  owner: 'Chủ thuyền',
+};
 
 export const CERTIFICATE_STATUS_META: Record<
   string,
@@ -133,6 +154,9 @@ export const certificateApi = {
   getPending: () =>
     Api.get<ApiResponse<CertificateListItem[]>>('/admin/certificates/pending'),
 
+  getApproved: () =>
+    Api.get<ApiResponse<CertificateListItem[]>>('/admin/certificates/approved'),
+
   getExpiring: () =>
     Api.get<ApiResponse<CertificateListItem[]>>('/admin/certificates/expiring'),
 
@@ -152,8 +176,10 @@ export const certificateApi = {
       `/admin/boats/${boatId}/unlock`,
     ),
 
-  getTypes: () =>
-    Api.get<ApiResponse<CertificateTypeItem[]>>('/admin/certificate-types'),
+  getTypes: (scope?: CertificateScope | string) =>
+    Api.get<ApiResponse<CertificateTypeItem[]>>('/admin/certificate-types', {
+      params: scope ? { scope } : undefined,
+    }),
 
   createType: (data: CreateCertificateTypeRequest) =>
     Api.post<ApiResponse<CertificateTypeItem>>(

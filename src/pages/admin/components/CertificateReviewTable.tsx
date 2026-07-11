@@ -11,7 +11,6 @@ import {
 import { toast } from 'sonner';
 import {
   certificateApi,
-  CERTIFICATE_TYPE_LABELS,
   CERTIFICATE_STATUS_META,
   type CertificateListItem,
 } from '@/services/certificate-api';
@@ -29,14 +28,22 @@ interface CertificateReviewTableProps {
 
 function formatDate(value: string) {
   if (!value) return '—';
+  const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (iso) return `${iso[3]}/${iso[2]}/${iso[1]}`;
   const d = new Date(value);
-  if (Number.isNaN(d.getTime())) {
-    // DateOnly often comes as YYYY-MM-DD
-    const parts = value.split('-');
-    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    return value;
-  }
-  return d.toLocaleDateString('vi-VN');
+  if (Number.isNaN(d.getTime())) return value;
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function expiryHint(cert: CertificateListItem) {
+  if (typeof cert.daysUntilExpiry !== 'number') return null;
+  const days = cert.daysUntilExpiry;
+  if (days < 0) return `Quá hạn ${Math.abs(days)} ngày`;
+  if (days === 0) return 'Hết hạn hôm nay';
+  return `Còn ${days} ngày`;
 }
 
 export default function CertificateReviewTable({
@@ -48,7 +55,7 @@ export default function CertificateReviewTable({
   emptyMessage = 'Không có giấy tờ nào',
   onChanged,
 }: CertificateReviewTableProps) {
-  const labels = typeLabels ?? CERTIFICATE_TYPE_LABELS;
+  const labels = typeLabels ?? {};
   const [actionId, setActionId] = useState<string | null>(null);
   const [rejectTarget, setRejectTarget] = useState<CertificateListItem | null>(
     null,
@@ -215,11 +222,29 @@ export default function CertificateReviewTable({
                         </div>
                       </td>
                     )}
-                    <td
-                      className="px-3 py-3 text-xs"
-                      style={{ color: '#c8d0e0' }}
-                    >
-                      {formatDate(cert.expiryDate)}
+                    <td className="px-3 py-3 text-xs">
+                      <div
+                        style={{
+                          color: cert.isExpiringSoon ? '#F97316' : '#c8d0e0',
+                        }}
+                      >
+                        {formatDate(cert.expiryDate)}
+                      </div>
+                      {expiryHint(cert) && (
+                        <div
+                          className="mt-0.5 text-[10px] font-semibold"
+                          style={{
+                            color: cert.isExpiringSoon
+                              ? '#F97316'
+                              : cert.daysUntilExpiry != null &&
+                                  cert.daysUntilExpiry < 0
+                                ? '#EF4444'
+                                : '#8892a0',
+                          }}
+                        >
+                          {expiryHint(cert)}
+                        </div>
+                      )}
                     </td>
                     <td className="px-3 py-3">
                       <span
@@ -297,6 +322,7 @@ export default function CertificateReviewTable({
         key={rejectTarget?.id ?? 'closed'}
         open={!!rejectTarget}
         certificate={rejectTarget}
+        typeLabels={labels}
         submitting={rejecting}
         onClose={() => !rejecting && setRejectTarget(null)}
         onConfirm={handleRejectConfirm}

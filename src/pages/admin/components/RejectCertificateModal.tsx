@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { X, ShieldX, Loader2 } from 'lucide-react';
 import type { CertificateListItem } from '@/services/certificate-api';
-import { CERTIFICATE_TYPE_LABELS } from '@/services/certificate-api';
+import { typeLabel } from '@/services/certificate-api';
 
 const ACCENT = '#FF385C';
 
 interface RejectCertificateModalProps {
   open: boolean;
   certificate: CertificateListItem | null;
+  typeLabels?: Record<string, string>;
   submitting?: boolean;
   onClose: () => void;
   onConfirm: (reason: string) => void;
@@ -16,6 +17,7 @@ interface RejectCertificateModalProps {
 export default function RejectCertificateModal({
   open,
   certificate,
+  typeLabels,
   submitting = false,
   onClose,
   onConfirm,
@@ -24,9 +26,7 @@ export default function RejectCertificateModal({
 
   if (!open || !certificate) return null;
 
-  const typeLabel =
-    CERTIFICATE_TYPE_LABELS[certificate.certificateType] ??
-    certificate.certificateType;
+  const resolvedType = typeLabel(certificate.certificateType, typeLabels);
 
   return (
     <>
@@ -56,7 +56,7 @@ export default function RejectCertificateModal({
                   Từ chối giấy tờ
                 </h3>
                 <p className="text-xs mt-0.5" style={{ color: '#8892a0' }}>
-                  {certificate.boatName} · {typeLabel}
+                  {certificate.boatName} · {resolvedType}
                 </p>
               </div>
             </div>

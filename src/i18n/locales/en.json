@@ -715,5 +715,74 @@
         "default": "Maintenance"
       }
     }
+  },
+  "adminOwnerVerification": {
+    "fields": {
+      "nationalId": "National ID / Passport",
+      "nationalIdNumber": "National ID / Passport number",
+      "entityType": "Entity type"
+    },
+    "entityTypes": {
+      "individual": "Individual",
+      "business": "Business",
+      "cooperative": "Cooperative"
+    },
+    "ownerDocuments": {
+      "title": "Owner documents",
+      "hint": "Reference files only — approve or reject the whole application, not each document.",
+      "empty": "No owner documents uploaded",
+      "view": "View",
+      "expiresOn": "Expires: {{date}}",
+      "adminNote": "Note: {{note}}"
+    }
+  },
+  "certificateTypesManager": {
+    "title": "Certificate type catalog",
+    "subtitle": "These types appear in owner/boat document upload dropdowns",
+    "add": "Add type",
+    "filterAll": "All scopes",
+    "scopes": {
+      "boat": "Boat",
+      "owner": "Owner"
+    },
+    "formCreate": "Add new type",
+    "formEdit": "Edit: {{code}}",
+    "fields": {
+      "code": "Code — cannot change after create",
+      "nameVi": "Vietnamese name",
+      "nameEn": "English name",
+      "scope": "Scope",
+      "sortOrder": "Sort order"
+    },
+    "active": "Visible",
+    "inactive": "Hidden",
+    "cancel": "Cancel",
+    "save": "Save",
+    "empty": "No certificate types yet",
+    "columns": {
+      "code": "Code",
+      "nameVi": "Name VI",
+      "nameEn": "Name EN",
+      "scope": "Scope",
+      "sortOrder": "Order",
+      "status": "Status"
+    },
+    "statusVisible": "Visible",
+    "statusHidden": "Hidden",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loadError": "Failed to load certificate types",
+    "createSuccess": "Certificate type added",
+    "createError": "Failed to add certificate type",
+    "updateSuccess": "Certificate type updated",
+    "updateError": "Failed to update certificate type",
+    "deleteSuccess": "Certificate type deleted / deactivated",
+    "deleteError": "Failed to delete certificate type",
+    "deleteConfirm": "Delete type \"{{name}}\"?\nIf documents already use this code, it will only be deactivated.",
+    "genericError": "Something went wrong",
+    "validation": {
+      "namesRequired": "Please enter Vietnamese and English names",
+      "codeRequired": "Please enter a type code"
+    }
   }
 }

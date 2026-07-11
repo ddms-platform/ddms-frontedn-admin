@@ -14,12 +14,22 @@ import {
   Ship,
   Info,
   AlertTriangle,
+  ExternalLink,
+  Building2,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Api } from '@/services/axios';
 import { toast } from 'sonner';
 import CertificateReviewTable from '@/pages/admin/components/CertificateReviewTable';
-import type { CertificateListItem } from '@/services/certificate-api';
-import { CERTIFICATE_STATUS_META } from '@/services/certificate-api';
+import {
+  CERTIFICATE_STATUS_META,
+  OWNER_ENTITY_TYPE_LABELS,
+  buildTypeLabelMap,
+  certificateApi,
+  type CertificateListItem,
+  type OwnerDocumentListItem,
+  type OwnerEntityType,
+} from '@/services/certificate-api';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -77,10 +87,18 @@ interface OwnerData {
   phone: string;
   address: string;
   license: string;
+  entityType: OwnerEntityType | string;
   submitted: string;
   status: Status;
   boats: number;
+  documents?: OwnerDocumentListItem[];
   vessels?: VesselData[];
+}
+
+function formatExpiryDate(value?: string | null) {
+  if (!value) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : value;
 }
 
 function getOwnerCertAlerts(owner: OwnerData) {
@@ -92,19 +110,39 @@ function getOwnerCertAlerts(owner: OwnerData) {
 }
 
 export default function AdminOwnerVerification() {
+  const { t } = useTranslation();
   const [owners, setOwners] = useState<OwnerData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | Status>('all');
   const [selected, setSelected] = useState<string | null>(null);
+  const [typeLabels, setTypeLabels] = useState<Record<string, string>>({});
+
+  const entityTypeLabel = (entityType?: string) =>
+    t(`adminOwnerVerification.entityTypes.${entityType || 'individual'}`, {
+      defaultValue:
+        OWNER_ENTITY_TYPE_LABELS[entityType || 'individual'] ||
+        entityType ||
+        'individual',
+    });
+
+  const documentTypeLabel = (code: string) => typeLabels[code] || code;
 
   const fetchOwners = () => {
     setIsLoading(true);
-    Api.get('/admin/owners/verifications')
-      .then((res) => {
+    Promise.all([
+      Api.get('/admin/owners/verifications'),
+      certificateApi.getTypes().catch(() => null),
+    ])
+      .then(([res, typesRes]) => {
+        if (typesRes?.status === 200 && typesRes.data?.code === 1000) {
+          setTypeLabels(buildTypeLabelMap(typesRes.data.result || []));
+        }
         if (res.status === 200 && res.data?.code === 1000) {
           const list = (res.data.result || []).map((o: any) => ({
             ...o,
             status: o.status === 'approved' ? 'verified' : o.status,
+            entityType: o.entityType || 'individual',
+            documents: o.documents || [],
             vessels: (o.vessels || []).map((v: any) => ({
               ...v,
               certificates: v.certificates || [],
@@ -290,6 +328,16 @@ export default function AdminOwnerVerification() {
                     </h3>
                     <span
                       className="flex items-center gap-1 rounded-lg px-2.5 py-0.5 text-xs font-semibold"
+                      style={{
+                        backgroundColor: 'rgba(59,130,246,0.12)',
+                        color: '#3B82F6',
+                      }}
+                    >
+                      <Building2 size={11} />
+                      {entityTypeLabel(o.entityType)}
+                    </span>
+                    <span
+                      className="flex items-center gap-1 rounded-lg px-2.5 py-0.5 text-xs font-semibold"
                       style={{ backgroundColor: st.bg, color: st.color }}
                     >
                       <Icon size={11} />
@@ -341,13 +389,24 @@ export default function AdminOwnerVerification() {
                         className="text-[10px] uppercase tracking-wider"
                         style={{ color: '#8892a0' }}
                       >
-                        Giấy phép
+                        {t('adminOwnerVerification.fields.nationalId')}
                       </p>
                       <p
                         className="text-sm font-mono font-semibold"
                         style={{ color: '#fff' }}
                       >
                         {o.license}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        className="text-[10px] uppercase tracking-wider"
+                        style={{ color: '#8892a0' }}
+                      >
+                        {t('adminOwnerVerification.fields.entityType')}
+                      </p>
+                      <p className="text-sm" style={{ color: '#fff' }}>
+                        {entityTypeLabel(o.entityType)}
                       </p>
                     </div>
                     <div>
@@ -451,6 +510,18 @@ export default function AdminOwnerVerification() {
                           className="text-xs flex items-center gap-1.5"
                           style={{ color: '#8892a0' }}
                         >
+                          <Building2 size={12} />{' '}
+                          {t('adminOwnerVerification.fields.entityType')}
+                        </p>
+                        <p className="font-semibold text-white">
+                          {entityTypeLabel(o.entityType)}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p
+                          className="text-xs flex items-center gap-1.5"
+                          style={{ color: '#8892a0' }}
+                        >
                           <Phone size={12} /> Số điện thoại
                         </p>
                         <p className="font-semibold text-white">{o.phone}</p>
@@ -469,7 +540,7 @@ export default function AdminOwnerVerification() {
                           className="text-xs flex items-center gap-1"
                           style={{ color: '#8892a0' }}
                         >
-                          Số giấy phép kinh doanh
+                          {t('adminOwnerVerification.fields.nationalIdNumber')}
                         </p>
                         <p className="font-mono font-semibold text-white">
                           {o.license}
@@ -485,6 +556,86 @@ export default function AdminOwnerVerification() {
                         <p className="font-semibold text-white">{o.address}</p>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Owner documents (reference only — no per-doc approve) */}
+                  <div className="border-t border-white/5 pt-5 space-y-3">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[#8892a0] flex items-center gap-1.5">
+                      <FileText size={14} />{' '}
+                      {t('adminOwnerVerification.ownerDocuments.title')} (
+                      {o.documents?.length ?? 0})
+                    </p>
+                    <p className="text-xs" style={{ color: '#8892a0' }}>
+                      {t('adminOwnerVerification.ownerDocuments.hint')}
+                    </p>
+                    {o.documents && o.documents.length > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {o.documents.map((doc) => (
+                          <div
+                            key={doc.id}
+                            className="rounded-xl p-3 flex items-start justify-between gap-3"
+                            style={{
+                              backgroundColor: 'rgba(255,255,255,0.015)',
+                              border: '1px solid rgba(255,255,255,0.04)',
+                            }}
+                          >
+                            <div className="min-w-0 space-y-1">
+                              <p className="text-sm font-semibold text-white truncate">
+                                {documentTypeLabel(doc.documentType)}
+                              </p>
+                              <p
+                                className="text-[10px] font-mono"
+                                style={{ color: '#8892a0' }}
+                              >
+                                {doc.documentType}
+                              </p>
+                              {doc.expiryDate && (
+                                <p
+                                  className="text-xs"
+                                  style={{ color: '#c8d0e0' }}
+                                >
+                                  {t(
+                                    'adminOwnerVerification.ownerDocuments.expiresOn',
+                                    { date: formatExpiryDate(doc.expiryDate) },
+                                  )}
+                                </p>
+                              )}
+                              {doc.adminNote && (
+                                <p
+                                  className="text-xs"
+                                  style={{ color: '#F59E0B' }}
+                                >
+                                  {t(
+                                    'adminOwnerVerification.ownerDocuments.adminNote',
+                                    { note: doc.adminNote },
+                                  )}
+                                </p>
+                              )}
+                            </div>
+                            <a
+                              href={doc.documentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors hover:opacity-80"
+                              style={{
+                                backgroundColor: 'rgba(255,56,92,0.12)',
+                                color: '#FF385C',
+                              }}
+                            >
+                              <ExternalLink size={12} />
+                              {t('adminOwnerVerification.ownerDocuments.view')}
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p
+                        className="text-xs italic"
+                        style={{ color: '#8892a0' }}
+                      >
+                        {t('adminOwnerVerification.ownerDocuments.empty')}
+                      </p>
+                    )}
                   </div>
 
                   {/* Registered Vessels */}
@@ -622,6 +773,7 @@ export default function AdminOwnerVerification() {
                                 certificates={vessel.certificates || []}
                                 showBoatInfo={false}
                                 showOwnerInfo={false}
+                                typeLabels={typeLabels}
                                 emptyMessage="Chưa có giấy tờ pháp lý"
                                 onChanged={fetchOwners}
                               />

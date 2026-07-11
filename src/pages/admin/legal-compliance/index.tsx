@@ -26,11 +26,12 @@ const CARD = {
   border: '1px solid rgba(255,255,255,0.06)',
 } as const;
 
-type Tab = 'pending' | 'expiring' | 'blocked' | 'types';
+type Tab = 'pending' | 'approved' | 'expiring' | 'blocked' | 'types';
 
 export default function AdminLegalCompliance() {
   const [tab, setTab] = useState<Tab>('pending');
   const [pending, setPending] = useState<CertificateListItem[]>([]);
+  const [approved, setApproved] = useState<CertificateListItem[]>([]);
   const [expiring, setExpiring] = useState<CertificateListItem[]>([]);
   const [blockedBoats, setBlockedBoats] = useState<BoatListItemResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,13 +42,17 @@ export default function AdminLegalCompliance() {
     setLoading(true);
     Promise.all([
       certificateApi.getPending(),
+      certificateApi.getApproved(),
       certificateApi.getExpiring(),
       boatApi.getAll(),
       certificateApi.getTypes(),
     ])
-      .then(([pendingRes, expiringRes, boatsRes, typesRes]) => {
+      .then(([pendingRes, approvedRes, expiringRes, boatsRes, typesRes]) => {
         if (pendingRes.status === 200 && pendingRes.data?.code === 1000) {
           setPending(pendingRes.data.result || []);
+        }
+        if (approvedRes.status === 200 && approvedRes.data?.code === 1000) {
+          setApproved(approvedRes.data.result || []);
         }
         if (expiringRes.status === 200 && expiringRes.data?.code === 1000) {
           setExpiring(expiringRes.data.result || []);
@@ -114,6 +119,13 @@ export default function AdminLegalCompliance() {
         icon: Clock,
       },
       {
+        label: 'Đã duyệt',
+        value: approved.length,
+        color: '#10B981',
+        bg: 'rgba(16,185,129,0.12)',
+        icon: CheckCircle,
+      },
+      {
         label: 'Sắp hết hạn',
         value: expiring.length,
         color: '#F97316',
@@ -128,11 +140,12 @@ export default function AdminLegalCompliance() {
         icon: FileWarning,
       },
     ],
-    [pending.length, expiring.length, blockedBoats.length],
+    [pending.length, approved.length, expiring.length, blockedBoats.length],
   );
 
   const tabs: { id: Tab; label: string; count?: number }[] = [
     { id: 'pending', label: 'Chờ duyệt', count: pending.length },
+    { id: 'approved', label: 'Đã duyệt', count: approved.length },
     { id: 'expiring', label: 'Sắp hết hạn', count: expiring.length },
     { id: 'blocked', label: 'Tàu bị chặn', count: blockedBoats.length },
     { id: 'types', label: 'Loại giấy tờ' },
@@ -168,7 +181,7 @@ export default function AdminLegalCompliance() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
           <div
             key={s.label}
@@ -241,6 +254,18 @@ export default function AdminLegalCompliance() {
           />
         )}
 
+        {tab === 'approved' && (
+          <CertificateReviewTable
+            certificates={approved}
+            loading={loading}
+            showBoatInfo
+            showOwnerInfo
+            typeLabels={typeLabels}
+            emptyMessage="Chưa có giấy tờ nào được duyệt"
+            onChanged={fetchData}
+          />
+        )}
+
         {tab === 'expiring' && (
           <CertificateReviewTable
             certificates={expiring}
@@ -248,7 +273,7 @@ export default function AdminLegalCompliance() {
             showBoatInfo
             showOwnerInfo
             typeLabels={typeLabels}
-            emptyMessage="Không có giấy tờ sắp hết hạn"
+            emptyMessage="Không có giấy tờ hết hạn trong cửa sổ cảnh báo hiện tại"
             onChanged={fetchData}
           />
         )}
