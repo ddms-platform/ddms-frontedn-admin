@@ -12,7 +12,9 @@
       "signingIn": "Signing in...",
       "orContinueWith": "or continue with",
       "dontHaveAccount": "Don't have an account",
-      "signUpLink": "Sign up"
+      "signUpLink": "Sign up",
+      "success": "Signed in successfully",
+      "error": "Sign in failed. Check your email and password."
     },
     "signUp": {
       "title": "Create your account",
@@ -557,7 +559,8 @@
       "faqs": "FAQs",
       "notifications": "Notifications",
       "auditLogs": "Audit Logs",
-      "approvals": "Approvals"
+      "approvals": "Approvals",
+      "legalCompliance": "Legal Compliance"
     }
   },
   "ownerLayout": {

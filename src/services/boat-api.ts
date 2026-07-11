@@ -43,6 +43,7 @@ export interface BoatListItemResponse {
   type?: string;
   maxPassengers: number;
   status: string;
+  complianceStatus?: string;
   cabinCount: number;
   serviceCount: number;
   thumbnailUrl?: string;

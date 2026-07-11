@@ -13,9 +13,13 @@ import {
   FileText,
   Ship,
   Info,
+  AlertTriangle,
 } from 'lucide-react';
 import { Api } from '@/services/axios';
 import { toast } from 'sonner';
+import CertificateReviewTable from '@/pages/admin/components/CertificateReviewTable';
+import type { CertificateListItem } from '@/services/certificate-api';
+import { CERTIFICATE_STATUS_META } from '@/services/certificate-api';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -61,6 +65,7 @@ interface VesselData {
   requiredServices: string[];
   documentUrls: string[];
   imageUrls: string[];
+  certificates?: CertificateListItem[];
   status: string;
 }
 
@@ -78,6 +83,14 @@ interface OwnerData {
   vessels?: VesselData[];
 }
 
+function getOwnerCertAlerts(owner: OwnerData) {
+  const certs = owner.vessels?.flatMap((v) => v.certificates || []) ?? [];
+  const pendingCount = certs.filter((c) => c.status === 'pending').length;
+  const rejectedCount = certs.filter((c) => c.status === 'rejected').length;
+  const expiredCount = certs.filter((c) => c.status === 'expired').length;
+  return { pendingCount, rejectedCount, expiredCount, total: certs.length };
+}
+
 export default function AdminOwnerVerification() {
   const [owners, setOwners] = useState<OwnerData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,6 +105,10 @@ export default function AdminOwnerVerification() {
           const list = (res.data.result || []).map((o: any) => ({
             ...o,
             status: o.status === 'approved' ? 'verified' : o.status,
+            vessels: (o.vessels || []).map((v: any) => ({
+              ...v,
+              certificates: v.certificates || [],
+            })),
           }));
           setOwners(list);
         }
@@ -255,6 +272,7 @@ export default function AdminOwnerVerification() {
         {filtered.map((o) => {
           const st = ST_MAP[o.status] || ST_MAP.pending;
           const Icon = st.icon;
+          const alerts = getOwnerCertAlerts(o);
           return (
             <div
               key={o.id}
@@ -277,6 +295,40 @@ export default function AdminOwnerVerification() {
                       <Icon size={11} />
                       {st.label}
                     </span>
+                    {alerts.pendingCount > 0 && (
+                      <span
+                        className="flex items-center gap-1 rounded-lg px-2.5 py-0.5 text-xs font-semibold"
+                        style={{
+                          backgroundColor: CERTIFICATE_STATUS_META.pending.bg,
+                          color: CERTIFICATE_STATUS_META.pending.color,
+                        }}
+                      >
+                        <AlertTriangle size={11} />
+                        {alerts.pendingCount} giấy tờ chờ duyệt
+                      </span>
+                    )}
+                    {alerts.rejectedCount > 0 && (
+                      <span
+                        className="flex items-center gap-1 rounded-lg px-2.5 py-0.5 text-xs font-semibold"
+                        style={{
+                          backgroundColor: CERTIFICATE_STATUS_META.rejected.bg,
+                          color: CERTIFICATE_STATUS_META.rejected.color,
+                        }}
+                      >
+                        {alerts.rejectedCount} bị từ chối
+                      </span>
+                    )}
+                    {alerts.expiredCount > 0 && (
+                      <span
+                        className="flex items-center gap-1 rounded-lg px-2.5 py-0.5 text-xs font-semibold"
+                        style={{
+                          backgroundColor: CERTIFICATE_STATUS_META.expired.bg,
+                          color: CERTIFICATE_STATUS_META.expired.color,
+                        }}
+                      >
+                        {alerts.expiredCount} hết hạn
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm mt-1" style={{ color: '#8892a0' }}>
                     Đại diện:{' '}
@@ -521,56 +573,63 @@ export default function AdminOwnerVerification() {
                               </div>
                             </div>
 
-                            {/* Images and Documents */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-white/5">
-                              {/* Images */}
-                              <div>
+                            {/* Images */}
+                            <div className="pt-3 border-t border-white/5">
+                              <p
+                                className="text-[11px] font-bold uppercase tracking-wider mb-2"
+                                style={{ color: '#8892a0' }}
+                              >
+                                Hình ảnh tàu thuyền
+                              </p>
+                              {vessel.imageUrls &&
+                              vessel.imageUrls.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                  {vessel.imageUrls.map((url, idx) => (
+                                    <a
+                                      key={idx}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="relative group block overflow-hidden rounded-lg border border-white/10 shrink-0"
+                                    >
+                                      <img
+                                        src={url}
+                                        alt={`boat-img-${idx}`}
+                                        className="h-16 w-24 object-cover transition-transform group-hover:scale-105"
+                                      />
+                                    </a>
+                                  ))}
+                                </div>
+                              ) : (
                                 <p
-                                  className="text-[11px] font-bold uppercase tracking-wider mb-2"
+                                  className="text-xs italic"
                                   style={{ color: '#8892a0' }}
                                 >
-                                  Hình ảnh tàu thuyền
+                                  Không có hình ảnh đính kèm
                                 </p>
-                                {vessel.imageUrls &&
-                                vessel.imageUrls.length > 0 ? (
-                                  <div className="flex flex-wrap gap-2">
-                                    {vessel.imageUrls.map((url, idx) => (
-                                      <a
-                                        key={idx}
-                                        href={url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="relative group block overflow-hidden rounded-lg border border-white/10 shrink-0"
-                                      >
-                                        <img
-                                          src={url}
-                                          alt={`boat-img-${idx}`}
-                                          className="h-16 w-24 object-cover transition-transform group-hover:scale-105"
-                                        />
-                                      </a>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  <p
-                                    className="text-xs italic"
-                                    style={{ color: '#8892a0' }}
-                                  >
-                                    Không có hình ảnh đính kèm
-                                  </p>
-                                )}
-                              </div>
+                              )}
+                            </div>
 
-                              {/* Documents */}
-                              <div>
-                                <p
-                                  className="text-[11px] font-bold uppercase tracking-wider mb-2"
-                                  style={{ color: '#8892a0' }}
-                                >
-                                  Hồ sơ / Tài liệu đính kèm
-                                </p>
-                                {vessel.documentUrls &&
-                                vessel.documentUrls.length > 0 ? (
-                                  <div className="flex flex-col gap-1.5">
+                            {/* Certificates (per-document review) */}
+                            <div className="pt-3 border-t border-white/5 space-y-2">
+                              <p
+                                className="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5"
+                                style={{ color: '#8892a0' }}
+                              >
+                                <FileText size={12} /> Giấy tờ pháp lý
+                              </p>
+                              <CertificateReviewTable
+                                certificates={vessel.certificates || []}
+                                showBoatInfo={false}
+                                showOwnerInfo={false}
+                                emptyMessage="Chưa có giấy tờ pháp lý"
+                                onChanged={fetchOwners}
+                              />
+                              {(!vessel.certificates ||
+                                vessel.certificates.length === 0) &&
+                                vessel.documentUrls &&
+                                vessel.documentUrls.length > 0 && (
+                                  <div className="flex flex-col gap-1.5 mt-2">
                                     {vessel.documentUrls.map((url, idx) => (
                                       <a
                                         key={idx}
@@ -587,15 +646,7 @@ export default function AdminOwnerVerification() {
                                       </a>
                                     ))}
                                   </div>
-                                ) : (
-                                  <p
-                                    className="text-xs italic"
-                                    style={{ color: '#8892a0' }}
-                                  >
-                                    Không có tài liệu đính kèm
-                                  </p>
                                 )}
-                              </div>
                             </div>
 
                             {/* Required Services */}

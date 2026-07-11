@@ -12,7 +12,9 @@
       "signingIn": "Đang đăng nhập...",
       "orContinueWith": "hoặc tiếp tục với",
       "dontHaveAccount": "Chưa có tài khoản",
-      "signUpLink": "Đăng ký"
+      "signUpLink": "Đăng ký",
+      "success": "Đăng nhập thành công",
+      "error": "Đăng nhập thất bại. Kiểm tra email và mật khẩu."
     },
     "signUp": {
       "title": "Tạo tài khoản",
@@ -557,7 +559,8 @@
       "faqs": "Hỏi đáp",
       "notifications": "Thông báo",
       "auditLogs": "Nhật ký hệ thống",
-      "approvals": "Bảo trì và Hoàn tiền"
+      "approvals": "Bảo trì và Hoàn tiền",
+      "legalCompliance": "Kiểm duyệt pháp lý"
     }
   },
   "ownerLayout": {
