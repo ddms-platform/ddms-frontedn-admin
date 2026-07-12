@@ -43,6 +43,7 @@ export const routeName = Object.freeze({
   adminAuditLogs: '/admin/audit-logs',
   adminApprovals: '/admin/approvals',
   adminLegalCompliance: '/admin/legal-compliance',
+  kioskCheckin: '/kiosk-checkin',
 
   // System
   maintenance: '/maintenance',
