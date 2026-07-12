@@ -548,6 +548,7 @@
     "role": "Quản trị viên",
     "nav": {
       "dashboard": "Dashboard",
+      "kioskCheckin": "Quét QR Check-in",
       "users": "Người dùng",
       "ownerVerification": "Duyệt chủ thuyền",
       "docks": "Bến tàu",

@@ -548,6 +548,7 @@
     "role": "Administrator",
     "nav": {
       "dashboard": "Dashboard",
+      "kioskCheckin": "QR Check-in",
       "users": "Users",
       "ownerVerification": "Owner Verification",
       "docks": "Docks",

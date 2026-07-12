@@ -11,9 +11,11 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Loader2,
+  QrCode,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { routeName } from '@/constants/route-name';
+import { markKioskFullscreenRequest } from '@/utils/kiosk-fullscreen';
 import { Api } from '@/services/axios';
 
 const ACCENT = '#FF385C';
@@ -89,6 +91,12 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const openKioskCheckin = () => {
+    markKioskFullscreenRequest();
+    navigate(routeName.kioskCheckin);
+  };
 
   useEffect(() => {
     let active = true;
@@ -165,15 +173,30 @@ export default function AdminDashboard() {
             })}
           </p>
         </div>
-        <div
-          className="hidden sm:flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold"
-          style={{
-            backgroundColor: 'rgba(255,56,92,0.1)',
-            color: ACCENT,
-            border: '1px solid rgba(255,56,92,0.2)',
-          }}
-        >
-          <ShieldCheck size={16} /> Admin Portal
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={openKioskCheckin}
+            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all hover:scale-[1.02]"
+            style={{
+              background: `linear-gradient(135deg, ${ACCENT}, #c00030)`,
+              color: '#fff',
+              boxShadow: '0 4px 20px rgba(255,56,92,0.3)',
+            }}
+          >
+            <QrCode size={18} />
+            Quét QR Check-in
+          </button>
+          <div
+            className="hidden sm:flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold"
+            style={{
+              backgroundColor: 'rgba(255,56,92,0.1)',
+              color: ACCENT,
+              border: '1px solid rgba(255,56,92,0.2)',
+            }}
+          >
+            <ShieldCheck size={16} /> Admin Portal
+          </div>
         </div>
       </div>
 
