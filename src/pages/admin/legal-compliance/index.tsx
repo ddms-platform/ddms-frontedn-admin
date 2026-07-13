@@ -301,7 +301,7 @@ export default function AdminLegalCompliance() {
             <div className="space-y-3">
               {blockedBoats.map((boat) => {
                 const meta =
-                  COMPLIANCE_STATUS_META[boat.complianceStatus] ??
+                  COMPLIANCE_STATUS_META[boat.complianceStatus ?? 'locked'] ??
                   COMPLIANCE_STATUS_META.locked;
                 const busy = unlockingId === boat.id;
                 return (
