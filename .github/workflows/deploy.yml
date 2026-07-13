@@ -19,10 +19,12 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: |
+          corepack enable
+          yarn install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: yarn build
 
   deploy:
     name: Deploy to VM
@@ -41,4 +43,19 @@ jobs:
 
       - name: Run deploy script on VM
         run: |
-          ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'bash ~/deploy-admin.sh'
+          ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} '
+            set -e
+
+            APP_DIR=$(find "$HOME" -maxdepth 3 -type d -name ddms-frontedn-admin -print -quit)
+            if [ -z "$APP_DIR" ]; then
+              echo "Could not find ddms-frontedn-admin under $HOME"
+              exit 1
+            fi
+
+            cd "$APP_DIR"
+            git restore --worktree -- yarn.lock 2>/dev/null || git checkout -- yarn.lock 2>/dev/null || true
+            git restore --worktree -- package-lock.json 2>/dev/null || git checkout -- package-lock.json 2>/dev/null || true
+            git clean -f -- package-lock.json pnpm-lock.yaml 2>/dev/null || true
+
+            bash ~/deploy-admin.sh
+          '
