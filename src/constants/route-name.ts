@@ -1,11 +1,11 @@
 export const routeName = Object.freeze({
   // Auth
-  signIn: '/sign-in',
-  signUp: '/sign-up',
-  forgotPassword: '/forgot-password',
+  signIn: '/admin/sign-in',
+  signUp: '/admin/sign-up',
+  forgotPassword: '/admin/forgot-password',
 
   // Public
-  home: '/',
+  home: '/admin',
   tours: '/tours',
   tourDetail: '/tours/:id',
   tourBooking: '/tours/:id/booking',
