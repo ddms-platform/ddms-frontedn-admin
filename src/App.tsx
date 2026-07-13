@@ -32,6 +32,10 @@ const AdminNotifications = lazy(
 );
 const AdminAuditLogs = lazy(() => import('@/pages/admin/audit-logs/index'));
 const AdminApprovals = lazy(() => import('@/pages/admin/approvals/index'));
+const AdminLegalCompliance = lazy(
+  () => import('@/pages/admin/legal-compliance/index'),
+);
+const KioskCheckinPage = lazy(() => import('@/pages/kiosk-checkin/index'));
 
 // ── Owner pages ──────────────────────────────────────────────────────────────
 const OwnerBoats = lazy(() => import('@/pages/owner/boats/index'));
@@ -68,6 +72,16 @@ function App() {
                   }
                 />
               </Route>
+
+              {/* Kiosk Check-in — fullscreen, không sidebar */}
+              <Route
+                path={routeName.kioskCheckin}
+                element={
+                  <Suspense fallback={<PageLoader />}>
+                    <KioskCheckinPage />
+                  </Suspense>
+                }
+              />
 
               {/* Admin pages — role-gated */}
               <Route element={<ProtectedRoute roles={['admin']} />}>
@@ -173,6 +187,14 @@ function App() {
                     element={
                       <Suspense fallback={<PageLoader />}>
                         <AdminApprovals />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminLegalCompliance}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminLegalCompliance />
                       </Suspense>
                     }
                   />

@@ -14,6 +14,8 @@ import {
   Home,
   LogOut,
   ClipboardCheck,
+  Scale,
+  QrCode,
 } from 'lucide-react';
 import type { JSX } from 'react';
 import { routeName } from '@/constants/route-name';
@@ -37,6 +39,11 @@ export const adminSidelinks: SideLink[] = [
     href: routeName.admin,
     icon: <LayoutDashboard size={20} />,
     end: true,
+  },
+  {
+    title: 'adminLayout.nav.kioskCheckin',
+    href: routeName.kioskCheckin,
+    icon: <QrCode size={20} />,
   },
   {
     title: 'adminLayout.nav.users',
@@ -97,6 +104,11 @@ export const adminSidelinks: SideLink[] = [
     title: 'adminLayout.nav.approvals',
     href: routeName.adminApprovals,
     icon: <ClipboardCheck size={20} />,
+  },
+  {
+    title: 'adminLayout.nav.legalCompliance',
+    href: routeName.adminLegalCompliance,
+    icon: <Scale size={20} />,
   },
 ];
 

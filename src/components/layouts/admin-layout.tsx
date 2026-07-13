@@ -3,6 +3,7 @@ import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { ChevronLeft, Menu, X, Shield } from 'lucide-react';
 import { routeName } from '@/constants/route-name';
+import { markKioskFullscreenRequest } from '@/utils/kiosk-fullscreen';
 import logo from '@/assets/logo.png';
 import TranslationToggle from '@/components/shared/translation-toggle';
 import {
@@ -120,7 +121,14 @@ export default function AdminLayout() {
                 <NavLink
                   to={link.href}
                   end={link.end}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={(e) => {
+                    setMobileOpen(false);
+                    if (link.href === routeName.kioskCheckin) {
+                      e.preventDefault();
+                      markKioskFullscreenRequest();
+                      navigate(link.href);
+                    }
+                  }}
                   className={({ isActive }) =>
                     `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${isActive ? 'shadow-sm' : 'hover:bg-white/5'} ${collapsed ? 'justify-center' : ''}`
                   }

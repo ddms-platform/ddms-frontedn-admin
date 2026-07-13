@@ -19,6 +19,7 @@ import type {
   CreatePromotionRequest,
 } from '@/services/promotions-api';
 import { toast } from 'sonner';
+import DateInput from '@/components/ui/date-input';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -443,24 +444,21 @@ export default function AdminPromotions() {
               <label className="block text-xs font-semibold mb-1.5 text-[#8892a0]">
                 Ngày bắt đầu
               </label>
-              <input
-                type="date"
+              <DateInput
                 value={validFrom}
-                onChange={(e) => setValidFrom(e.target.value)}
+                onChange={setValidFrom}
                 required
                 min={editingId ? undefined : getTodayDateString()}
                 className="w-full rounded-xl py-2.5 px-4 text-sm outline-none bg-white/5 border border-white/10 text-white"
-                style={{ colorScheme: 'dark' }}
               />
             </div>
             <div>
               <label className="block text-xs font-semibold mb-1.5 text-[#8892a0]">
                 Ngày kết thúc
               </label>
-              <input
-                type="date"
+              <DateInput
                 value={validUntil}
-                onChange={(e) => setValidUntil(e.target.value)}
+                onChange={setValidUntil}
                 min={
                   validFrom
                     ? getNextDateString(validFrom)
@@ -469,7 +467,6 @@ export default function AdminPromotions() {
                       : getTodayDateString()
                 }
                 className="w-full rounded-xl py-2.5 px-4 text-sm outline-none bg-white/5 border border-white/10 text-white"
-                style={{ colorScheme: 'dark' }}
               />
             </div>
             <div className="sm:col-span-2">

@@ -20,6 +20,8 @@ import {
   ToggleLeft,
   ToggleRight,
   Loader2,
+  FileText,
+  Unlock,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -30,6 +32,12 @@ import {
   type BoatServiceResponse,
   type BoatStatsResponse,
 } from '@/services/boat-api';
+import {
+  certificateApi,
+  COMPLIANCE_STATUS_META,
+  type CertificateListItem,
+} from '@/services/certificate-api';
+import CertificateReviewTable from '@/pages/admin/components/CertificateReviewTable';
 
 /* ─────────────────────── Design tokens ─────────────────────── */
 const ACCENT = '#FF385C';
@@ -956,14 +964,16 @@ function ImagesTab({
 }
 
 /* ═══════════════════ BOAT DETAIL DRAWER ═══════════════════ */
-type DrawerTab = 'info' | 'cabins' | 'services' | 'images';
+type DrawerTab = 'info' | 'cabins' | 'services' | 'images' | 'certificates';
 
 function BoatDetailDrawer({
   boatId,
+  complianceStatus: initialCompliance,
   onClose,
   onRefresh,
 }: {
   boatId: string;
+  complianceStatus?: string;
   onClose: () => void;
   onRefresh: () => void;
 }) {
@@ -972,6 +982,12 @@ function BoatDetailDrawer({
   const [boat, setBoat] = useState<BoatDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [certificates, setCertificates] = useState<CertificateListItem[]>([]);
+  const [certsLoading, setCertsLoading] = useState(false);
+  const [complianceStatus, setComplianceStatus] = useState(
+    initialCompliance || 'valid',
+  );
+  const [unlocking, setUnlocking] = useState(false);
 
   // Form for info tab
   const [form, setForm] = useState({
@@ -982,8 +998,14 @@ function BoatDetailDrawer({
   });
 
   useEffect(() => {
-    loadBoat();
+    void loadBoat();
+    void loadCertificates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when boat changes
   }, [boatId]);
+
+  useEffect(() => {
+    setComplianceStatus(initialCompliance || 'valid');
+  }, [initialCompliance]);
 
   const loadBoat = async () => {
     try {
@@ -996,11 +1018,64 @@ function BoatDetailDrawer({
         maxPassengers: String(res.data.result.maxPassengers),
         status: res.data.result.status,
       });
-    } catch (error) {
+    } catch {
       toast.error('Không thể tải thông tin thuyền');
       onClose();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCertificates = async () => {
+    setCertsLoading(true);
+    try {
+      const [pendingRes, expiringRes] = await Promise.all([
+        certificateApi.getPending(),
+        certificateApi.getExpiring(),
+      ]);
+      const pending =
+        pendingRes.status === 200 && pendingRes.data?.code === 1000
+          ? pendingRes.data.result || []
+          : [];
+      const expiring =
+        expiringRes.status === 200 && expiringRes.data?.code === 1000
+          ? expiringRes.data.result || []
+          : [];
+      const byId = new Map<string, CertificateListItem>();
+      [...pending, ...expiring]
+        .filter((c) => c.boatId === boatId)
+        .forEach((c) => byId.set(c.id, c));
+      setCertificates(Array.from(byId.values()));
+    } catch {
+      setCertificates([]);
+    } finally {
+      setCertsLoading(false);
+    }
+  };
+
+  const handleUnlock = async () => {
+    if (
+      !confirm(
+        'Mở khóa tàu này? Tàu phải có ít nhất một giấy tờ đã duyệt và còn hạn.',
+      )
+    ) {
+      return;
+    }
+    setUnlocking(true);
+    try {
+      const res = await certificateApi.unlockBoat(boatId);
+      if (res.status === 200 && res.data?.code === 1000) {
+        toast.success('Đã mở khóa tàu thành công');
+        setComplianceStatus('valid');
+        onRefresh();
+        loadCertificates();
+      } else {
+        toast.error('Không thể mở khóa tàu');
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi mở khóa');
+    } finally {
+      setUnlocking(false);
     }
   };
 
@@ -1053,6 +1128,11 @@ function BoatDetailDrawer({
     );
   }
 
+  const complianceMeta =
+    COMPLIANCE_STATUS_META[complianceStatus] ?? COMPLIANCE_STATUS_META.valid;
+  const canUnlock =
+    complianceStatus === 'hidden' || complianceStatus === 'locked';
+
   const tabs: { id: DrawerTab; label: string; icon: React.ReactNode }[] = [
     { id: 'info', label: 'Thông tin', icon: <Ship size={14} /> },
     {
@@ -1069,6 +1149,11 @@ function BoatDetailDrawer({
       id: 'images',
       label: `Hình ảnh (${boat.images.length})`,
       icon: <ImageIcon size={14} />,
+    },
+    {
+      id: 'certificates',
+      label: `Giấy tờ (${certificates.length})`,
+      icon: <FileText size={14} />,
     },
   ];
 
@@ -1108,6 +1193,15 @@ function BoatDetailDrawer({
           </div>
           <div className="flex items-center gap-2">
             <StatusBadge status={boat.status} />
+            <span
+              className="rounded-lg px-2 py-0.5 text-[10px] font-semibold"
+              style={{
+                backgroundColor: complianceMeta.bg,
+                color: complianceMeta.color,
+              }}
+            >
+              {complianceMeta.label}
+            </span>
             <button
               onClick={onClose}
               className="rounded-lg p-1.5 hover:bg-white/10"
@@ -1120,14 +1214,14 @@ function BoatDetailDrawer({
 
         {/* Tabs */}
         <div
-          className="flex border-b"
+          className="flex border-b overflow-x-auto"
           style={{ borderColor: 'rgba(255,255,255,0.06)' }}
         >
           {tabs.map((t) => (
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className="flex flex-1 items-center justify-center gap-1.5 px-2 py-3 text-xs font-semibold transition-colors"
+              className="flex flex-1 items-center justify-center gap-1.5 px-2 py-3 text-xs font-semibold transition-colors whitespace-nowrap min-w-0"
               style={{
                 color: activeTab === t.id ? ACCENT : '#8892a0',
                 borderBottom:
@@ -1138,7 +1232,7 @@ function BoatDetailDrawer({
               }}
             >
               {t.icon}
-              {t.label}
+              <span className="hidden sm:inline">{t.label}</span>
             </button>
           ))}
         </div>
@@ -1379,6 +1473,62 @@ function BoatDetailDrawer({
           {activeTab === 'images' && (
             <ImagesTab boat={boat} onUpdate={handleUpdateBoat} />
           )}
+          {activeTab === 'certificates' && (
+            <div className="space-y-4">
+              <div
+                className="flex items-center justify-between gap-3 rounded-xl p-3"
+                style={{
+                  backgroundColor: complianceMeta.bg,
+                  border: `1px solid ${complianceMeta.color}33`,
+                }}
+              >
+                <div>
+                  <p
+                    className="text-xs font-semibold"
+                    style={{ color: complianceMeta.color }}
+                  >
+                    Tuân thủ pháp lý: {complianceMeta.label}
+                  </p>
+                  <p
+                    className="text-[10px] mt-0.5"
+                    style={{ color: '#8892a0' }}
+                  >
+                    Giấy tờ chờ duyệt / sắp hết hạn của tàu này
+                  </p>
+                </div>
+                {canUnlock && (
+                  <button
+                    type="button"
+                    disabled={unlocking}
+                    onClick={handleUnlock}
+                    className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-semibold disabled:opacity-50"
+                    style={{
+                      backgroundColor: 'rgba(16,185,129,0.15)',
+                      color: '#10B981',
+                    }}
+                  >
+                    {unlocking ? (
+                      <Loader2 size={11} className="animate-spin" />
+                    ) : (
+                      <Unlock size={11} />
+                    )}
+                    Mở khóa
+                  </button>
+                )}
+              </div>
+              <CertificateReviewTable
+                certificates={certificates}
+                loading={certsLoading}
+                showBoatInfo={false}
+                showOwnerInfo={false}
+                emptyMessage="Không có giấy tờ chờ duyệt hoặc sắp hết hạn"
+                onChanged={() => {
+                  loadCertificates();
+                  onRefresh();
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -1606,8 +1756,10 @@ export default function AdminBoats() {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
+  const [filterCompliance, setFilterCompliance] = useState<string>('all');
 
   const [selectedBoatId, setSelectedBoatId] = useState<string | null>(null);
+  const [selectedCompliance, setSelectedCompliance] = useState<string>('valid');
   const [showAddForm, setShowAddForm] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -1617,30 +1769,53 @@ export default function AdminBoats() {
   }, []);
 
   useEffect(() => {
-    fetchBoats();
-  }, [page, search, filterStatus, filterType]);
+    void fetchBoats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refetch on filter/page changes
+  }, [page, search, filterStatus, filterType, filterCompliance]);
 
   const fetchStats = async () => {
     try {
       const res = await boatApi.getStats();
       setStats(res.data.result);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const fetchBoats = async () => {
     setLoading(true);
     try {
-      const query: any = { page, pageSize: 10 };
-      if (search) query.search = search;
-      if (filterStatus !== 'all') query.status = filterStatus;
-      if (filterType !== 'all') query.type = filterType;
+      // Compliance filter is not supported by paged API — filter client-side via getAll
+      if (filterCompliance !== 'all') {
+        const res = await boatApi.getAll();
+        let items = res.data.result || [];
+        if (search) {
+          const q = search.toLowerCase();
+          items = items.filter((b) => b.name.toLowerCase().includes(q));
+        }
+        if (filterStatus !== 'all') {
+          items = items.filter((b) => b.status === filterStatus);
+        }
+        if (filterType !== 'all') {
+          items = items.filter((b) => b.type === filterType);
+        }
+        items = items.filter((b) => b.complianceStatus === filterCompliance);
+        const pageSize = 10;
+        const totalPagesCalc = Math.max(1, Math.ceil(items.length / pageSize));
+        const start = (page - 1) * pageSize;
+        setBoats(items.slice(start, start + pageSize));
+        setTotalPages(totalPagesCalc);
+      } else {
+        const query: any = { page, pageSize: 10 };
+        if (search) query.search = search;
+        if (filterStatus !== 'all') query.status = filterStatus;
+        if (filterType !== 'all') query.type = filterType;
 
-      const res = await boatApi.getBoats(query);
-      setBoats(res.data.result.items);
-      setTotalPages(res.data.result.totalPages || 1);
-    } catch (error) {
+        const res = await boatApi.getBoats(query);
+        setBoats(res.data.result.items);
+        setTotalPages(res.data.result.totalPages || 1);
+      }
+    } catch {
       toast.error('Không thể tải danh sách thuyền');
     } finally {
       setLoading(false);
@@ -1878,6 +2053,41 @@ export default function AdminBoats() {
               ))}
             </select>
           </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span
+              className="text-xs font-semibold"
+              style={{ color: '#8892a0' }}
+            >
+              Pháp lý:
+            </span>
+            {(['all', 'valid', 'warning', 'hidden', 'locked'] as const).map(
+              (s) => (
+                <button
+                  key={s}
+                  onClick={() => {
+                    setFilterCompliance(s);
+                    setPage(1);
+                  }}
+                  className="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
+                  style={{
+                    backgroundColor:
+                      filterCompliance === s
+                        ? ACCENT_BG
+                        : 'rgba(255,255,255,0.05)',
+                    color: filterCompliance === s ? ACCENT : '#c8d0e0',
+                    border:
+                      filterCompliance === s
+                        ? '1px solid rgba(255,56,92,0.3)'
+                        : '1px solid transparent',
+                  }}
+                >
+                  {s === 'all'
+                    ? 'Tất cả'
+                    : COMPLIANCE_STATUS_META[s]?.label || s}
+                </button>
+              ),
+            )}
+          </div>
         </div>
       )}
 
@@ -1893,6 +2103,7 @@ export default function AdminBoats() {
                   'Sức chứa',
                   'Cabin/DV',
                   'Trạng thái',
+                  'Pháp lý',
                   'Thao tác',
                 ].map((h) => (
                   <th
@@ -1911,7 +2122,7 @@ export default function AdminBoats() {
             >
               {loading && boats.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-16 text-center">
+                  <td colSpan={7} className="py-16 text-center">
                     <Loader2
                       size={24}
                       className="mx-auto animate-spin text-gray-500"
@@ -1921,7 +2132,7 @@ export default function AdminBoats() {
               ) : boats.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="py-16 text-center text-sm"
                     style={{ color: '#8892a0' }}
                   >
@@ -1929,101 +2140,122 @@ export default function AdminBoats() {
                   </td>
                 </tr>
               ) : (
-                boats.map((boat) => (
-                  <tr
-                    key={boat.id}
-                    className="group transition-colors hover:bg-white/2"
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-800">
-                          {boat.thumbnailUrl ? (
-                            <img
-                              src={boat.thumbnailUrl}
-                              alt={boat.name}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <Ship size={16} style={{ color: '#8892a0' }} />
-                          )}
+                boats.map((boat) => {
+                  const complianceMeta =
+                    COMPLIANCE_STATUS_META[boat.complianceStatus || 'valid'] ??
+                    COMPLIANCE_STATUS_META.valid;
+                  return (
+                    <tr
+                      key={boat.id}
+                      className="group transition-colors hover:bg-white/2"
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-800">
+                            {boat.thumbnailUrl ? (
+                              <img
+                                src={boat.thumbnailUrl}
+                                alt={boat.name}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <Ship size={16} style={{ color: '#8892a0' }} />
+                            )}
+                          </div>
+                          <div>
+                            <p
+                              className="font-semibold text-xs"
+                              style={{ color: '#fff' }}
+                            >
+                              {boat.name}
+                            </p>
+                            <p
+                              className="text-[10px]"
+                              style={{ color: '#8892a0' }}
+                            >
+                              ID: {boat.id.split('-')[0]}...
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p
-                            className="font-semibold text-xs"
-                            style={{ color: '#fff' }}
-                          >
-                            {boat.name}
-                          </p>
-                          <p
-                            className="text-[10px]"
+                      </td>
+                      <td className="px-4 py-3">
+                        <TypeBadge type={boat.type} />
+                      </td>
+                      <td
+                        className="px-4 py-3 text-xs"
+                        style={{ color: '#c8d0e0' }}
+                      >
+                        <div className="flex items-center gap-1">
+                          <Users size={11} style={{ color: '#8892a0' }} />
+                          {boat.maxPassengers}
+                        </div>
+                      </td>
+                      <td
+                        className="px-4 py-3 text-xs"
+                        style={{ color: '#c8d0e0' }}
+                      >
+                        <span>
+                          <BedDouble
+                            size={10}
+                            className="inline mr-0.5"
                             style={{ color: '#8892a0' }}
+                          />
+                          {boat.cabinCount}
+                        </span>
+                        <span className="mx-1.5" style={{ color: '#8892a0' }}>
+                          ·
+                        </span>
+                        <span>
+                          <Waves
+                            size={10}
+                            className="inline mr-0.5"
+                            style={{ color: '#8892a0' }}
+                          />
+                          {boat.serviceCount}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={boat.status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-semibold"
+                          style={{
+                            backgroundColor: complianceMeta.bg,
+                            color: complianceMeta.color,
+                          }}
+                        >
+                          {complianceMeta.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => {
+                              setSelectedBoatId(boat.id);
+                              setSelectedCompliance(
+                                boat.complianceStatus || 'valid',
+                              );
+                            }}
+                            className="rounded-lg p-1.5 hover:bg-white/10"
+                            style={{ color: '#3B82F6' }}
+                            title="Xem chi tiết & Chỉnh sửa"
                           >
-                            ID: {boat.id.split('-')[0]}...
-                          </p>
+                            <Edit2 size={14} />
+                          </button>
+                          <button
+                            onClick={() => setConfirmDelete(boat.id)}
+                            className="rounded-lg p-1.5 hover:bg-red-500/10"
+                            style={{ color: '#EF4444' }}
+                            title="Xoá"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <TypeBadge type={boat.type} />
-                    </td>
-                    <td
-                      className="px-4 py-3 text-xs"
-                      style={{ color: '#c8d0e0' }}
-                    >
-                      <div className="flex items-center gap-1">
-                        <Users size={11} style={{ color: '#8892a0' }} />
-                        {boat.maxPassengers}
-                      </div>
-                    </td>
-                    <td
-                      className="px-4 py-3 text-xs"
-                      style={{ color: '#c8d0e0' }}
-                    >
-                      <span>
-                        <BedDouble
-                          size={10}
-                          className="inline mr-0.5"
-                          style={{ color: '#8892a0' }}
-                        />
-                        {boat.cabinCount}
-                      </span>
-                      <span className="mx-1.5" style={{ color: '#8892a0' }}>
-                        ·
-                      </span>
-                      <span>
-                        <Waves
-                          size={10}
-                          className="inline mr-0.5"
-                          style={{ color: '#8892a0' }}
-                        />
-                        {boat.serviceCount}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={boat.status} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => setSelectedBoatId(boat.id)}
-                          className="rounded-lg p-1.5 hover:bg-white/10"
-                          style={{ color: '#3B82F6' }}
-                          title="Xem chi tiết & Chỉnh sửa"
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
-                          onClick={() => setConfirmDelete(boat.id)}
-                          className="rounded-lg p-1.5 hover:bg-red-500/10"
-                          style={{ color: '#EF4444' }}
-                          title="Xoá"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -2114,6 +2346,7 @@ export default function AdminBoats() {
       {selectedBoatId && (
         <BoatDetailDrawer
           boatId={selectedBoatId}
+          complianceStatus={selectedCompliance}
           onClose={() => setSelectedBoatId(null)}
           onRefresh={handleRefresh}
         />
