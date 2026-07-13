@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import type { UserRole } from '@/data/user';
+import { routeName } from '@/constants/route-name';
 
 interface ProtectedRouteProps {
   redirectPath?: string;
@@ -9,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({
-  redirectPath = '/sign-in',
+  redirectPath = routeName.signIn,
   unauthorizedPath = '/',
   roles,
 }: ProtectedRouteProps) {

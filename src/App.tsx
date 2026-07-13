@@ -56,6 +56,14 @@ function App() {
               {/* Auth Routes - own layout, no header/footer */}
               <Route element={<AuthLayout />}>
                 <Route
+                  path="/sign-in"
+                  element={<Navigate to={routeName.signIn} replace />}
+                />
+                <Route
+                  path="/sign-up"
+                  element={<Navigate to={routeName.signUp} replace />}
+                />
+                <Route
                   path={routeName.signIn}
                   element={
                     <Suspense fallback={<PageLoader />}>
