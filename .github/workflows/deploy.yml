@@ -46,16 +46,27 @@ jobs:
           ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} '
             set -e
 
-            APP_DIR=$(find "$HOME" -maxdepth 3 -type d -name ddms-frontedn-admin -print -quit)
-            if [ -z "$APP_DIR" ]; then
-              echo "Could not find ddms-frontedn-admin under $HOME"
-              exit 1
-            fi
+            REAL_GIT=$(command -v git)
+            WRAP_DIR=$(mktemp -d)
+            trap "rm -rf \"$WRAP_DIR\"" EXIT
 
-            cd "$APP_DIR"
-            git restore --worktree -- yarn.lock 2>/dev/null || git checkout -- yarn.lock 2>/dev/null || true
-            git restore --worktree -- package-lock.json 2>/dev/null || git checkout -- package-lock.json 2>/dev/null || true
-            git clean -f -- package-lock.json pnpm-lock.yaml 2>/dev/null || true
+            cat > "$WRAP_DIR/git" <<EOF
+          #!/usr/bin/env bash
+          set -e
+          REAL_GIT="$REAL_GIT"
 
-            bash ~/deploy-admin.sh
+          case "\$1" in
+            pull|merge|rebase)
+              if "\$REAL_GIT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+                "\$REAL_GIT" restore --worktree -- yarn.lock package-lock.json 2>/dev/null || "\$REAL_GIT" checkout -- yarn.lock package-lock.json 2>/dev/null || true
+                "\$REAL_GIT" clean -f -- package-lock.json pnpm-lock.yaml 2>/dev/null || true
+              fi
+              ;;
+          esac
+
+          exec "\$REAL_GIT" "\$@"
+          EOF
+            chmod +x "$WRAP_DIR/git"
+
+            PATH="$WRAP_DIR:$PATH" bash ~/deploy-admin.sh
           '
