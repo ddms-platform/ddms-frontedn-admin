@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, type CameraDevice } from 'html5-qrcode';
 import {
   ArrowLeft,
   CheckCircle2,
+  Keyboard,
   Loader2,
   QrCode,
   ScanLine,
@@ -22,6 +23,31 @@ import {
 
 const ACCENT = '#FF385C';
 const SCANNER_ID = 'kiosk-qr-reader';
+
+function isLocalHost(hostname: string) {
+  return hostname === 'localhost' || hostname === '127.0.0.1';
+}
+
+/** Mobile/LAN over HTTP cannot use camera — browser security policy. */
+function getCameraBlockedReason(): string | null {
+  if (typeof window === 'undefined') return null;
+  if (window.isSecureContext || isLocalHost(window.location.hostname)) {
+    return null;
+  }
+  return 'Trình duyệt không cho phép camera qua HTTP + IP LAN (chỉ hỗ trợ HTTPS hoặc localhost). Dùng laptop để quét QR, hoặc nhập mã vé thủ công bên dưới.';
+}
+
+function formatCameraError(error: unknown): string {
+  const message =
+    error instanceof Error ? error.message : 'Không tìm thấy camera';
+  if (message.includes('Permission') || message.includes('NotAllowed')) {
+    return 'Trình duyệt đã chặn quyền camera. Vui lòng cho phép camera trong cài đặt trình duyệt, hoặc dùng nhập mã thủ công.';
+  }
+  if (getCameraBlockedReason()) {
+    return getCameraBlockedReason()!;
+  }
+  return `Không thể mở camera: ${message}. Bạn có thể nhập mã vé thủ công.`;
+}
 
 function playBeep() {
   try {
@@ -50,8 +76,8 @@ function extractBookingCode(raw: string): string {
       bookingId?: string;
       bookingCode?: string;
     };
-    if (json.bookingCode) return json.bookingCode;
     if (json.bookingId) return json.bookingId;
+    if (json.bookingCode) return json.bookingCode;
   } catch {
     // not JSON
   }
@@ -64,16 +90,68 @@ function extractBookingCode(raw: string): string {
   return text;
 }
 
+async function startCameraWithFallback(
+  scanner: Html5Qrcode,
+  onDecode: (decodedText: string) => void,
+) {
+  const scanConfig = { fps: 10, qrbox: { width: 280, height: 280 } };
+  const noop = () => {};
+
+  const tryStart = async (camera: string | MediaTrackConstraints) => {
+    await scanner.start(camera, scanConfig, onDecode, noop);
+  };
+
+  const attempts: Array<string | MediaTrackConstraints> = [
+    { facingMode: 'environment' },
+    { facingMode: 'user' },
+  ];
+
+  let lastError: unknown;
+  for (const camera of attempts) {
+    try {
+      await tryStart(camera);
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  let cameras: CameraDevice[] = [];
+  try {
+    cameras = await Html5Qrcode.getCameras();
+  } catch (error) {
+    lastError = error;
+  }
+
+  for (const camera of cameras) {
+    try {
+      await tryStart(camera.id);
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  const detail =
+    lastError instanceof Error ? lastError.message : 'Không tìm thấy camera';
+  throw new Error(detail);
+}
+
 type ScanState = 'idle' | 'scanning' | 'processing' | 'success' | 'error';
 
 export default function KioskCheckinPage() {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const processingRef = useRef(false);
   const lastScanRef = useRef('');
+  const shouldStartCameraRef = useRef(false);
 
   const [scanState, setScanState] = useState<ScanState>('idle');
   const [result, setResult] = useState<CheckInBookingResponse | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [manualCode, setManualCode] = useState('');
+  const [showManualInput, setShowManualInput] = useState(
+    () => !!getCameraBlockedReason(),
+  );
   const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(() =>
     consumeKioskFullscreenRequest(),
   );
@@ -89,9 +167,12 @@ export default function KioskCheckinPage() {
   const resetToScan = useCallback(async () => {
     setResult(null);
     setErrorMsg('');
+    setManualCode('');
+    setShowManualInput(false);
     setScanState('idle');
     processingRef.current = false;
     lastScanRef.current = '';
+    shouldStartCameraRef.current = false;
     await stopScanner();
   }, [stopScanner]);
 
@@ -128,41 +209,86 @@ export default function KioskCheckinPage() {
     [stopScanner],
   );
 
-  const startScanner = useCallback(async () => {
+  const requestStartScanner = useCallback(async () => {
+    const blockedReason = getCameraBlockedReason();
+    if (blockedReason) {
+      setResult(null);
+      setErrorMsg(blockedReason);
+      setScanState('error');
+      setShowManualInput(true);
+      return;
+    }
+
     await enterKioskFullscreen();
     await stopScanner();
-    setScanState('scanning');
     setResult(null);
     setErrorMsg('');
+    setShowManualInput(false);
+    shouldStartCameraRef.current = true;
+    setScanState('scanning');
+  }, [stopScanner]);
 
-    const scanner = new Html5Qrcode(SCANNER_ID);
-    scannerRef.current = scanner;
-
-    try {
-      await scanner.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 280, height: 280 } },
-        (decoded) => handleCheckIn(decoded),
-        () => {},
-      );
-    } catch {
-      setScanState('error');
-      setErrorMsg('Không thể mở camera. Vui lòng cấp quyền camera và thử lại.');
-    }
-  }, [handleCheckIn, stopScanner]);
+  const handleManualSubmit = useCallback(
+    async (event: React.FormEvent) => {
+      event.preventDefault();
+      const code = manualCode.trim();
+      if (!code) return;
+      await stopScanner();
+      shouldStartCameraRef.current = false;
+      await handleCheckIn(code);
+    },
+    [handleCheckIn, manualCode, stopScanner],
+  );
 
   const handleEnterKioskMode = useCallback(async () => {
     setShowFullscreenPrompt(false);
-    await startScanner();
-  }, [startScanner]);
+    await requestStartScanner();
+  }, [requestStartScanner]);
 
-  // Cleanup on unmount
+  useEffect(() => {
+    if (scanState !== 'scanning' || !shouldStartCameraRef.current) return;
+
+    let cancelled = false;
+
+    const bootScanner = async () => {
+      await stopScanner();
+
+      const scanner = new Html5Qrcode(SCANNER_ID);
+      scannerRef.current = scanner;
+
+      try {
+        await startCameraWithFallback(scanner, (decoded) => {
+          void handleCheckIn(decoded);
+        });
+        if (!cancelled) {
+          shouldStartCameraRef.current = false;
+        }
+      } catch (error) {
+        if (cancelled) return;
+        shouldStartCameraRef.current = false;
+        setScanState('error');
+        setErrorMsg(formatCameraError(error));
+        setShowManualInput(true);
+        await stopScanner();
+      }
+    };
+
+    void bootScanner();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [handleCheckIn, scanState, stopScanner]);
+
   useEffect(() => {
     return () => {
-      stopScanner();
-      exitKioskFullscreen();
+      void stopScanner();
+      void exitKioskFullscreen();
     };
   }, [stopScanner]);
+
+  const scannerVisible = scanState === 'scanning' || scanState === 'processing';
+  const cameraBlockedReason = getCameraBlockedReason();
 
   return (
     <div
@@ -226,9 +352,32 @@ export default function KioskCheckinPage() {
         </Link>
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-6 p-6">
+      <main className="flex flex-1 flex-col items-center justify-center gap-6 p-6 overflow-y-auto">
+        <div
+          id={SCANNER_ID}
+          className={`w-full max-w-lg overflow-hidden rounded-2xl ${
+            scannerVisible ? 'block' : 'hidden'
+          }`}
+          style={{ border: '2px solid rgba(255,56,92,0.3)', minHeight: 280 }}
+        />
+
         {scanState === 'idle' && (
           <div className="flex flex-col items-center gap-6 text-center">
+            {cameraBlockedReason && (
+              <div
+                className="w-full max-w-lg rounded-2xl px-5 py-4 text-left text-sm"
+                style={{
+                  backgroundColor: 'rgba(255,56,92,0.12)',
+                  border: '1px solid rgba(255,56,92,0.35)',
+                  color: '#ffb4c2',
+                }}
+              >
+                <p className="font-semibold text-white">
+                  Camera không khả dụng trên điện thoại / LAN
+                </p>
+                <p className="mt-2">{cameraBlockedReason}</p>
+              </div>
+            )}
             <div
               className="flex h-32 w-32 items-center justify-center rounded-3xl"
               style={{
@@ -241,29 +390,46 @@ export default function KioskCheckinPage() {
             <div>
               <h2 className="text-2xl font-bold text-white">Sẵn sàng quét</h2>
               <p className="mt-2 text-sm" style={{ color: '#8892a0' }}>
-                Nhấn nút bên dưới để bật camera và quét mã QR trên vé
+                {cameraBlockedReason ? (
+                  'Dùng laptop (localhost hoặc HTTPS) để quét QR, hoặc nhập mã vé thủ công bên dưới.'
+                ) : (
+                  <>
+                    Nhấn nút để bật camera. Trình duyệt sẽ hỏi quyền truy cập
+                    camera — chọn{' '}
+                    <strong className="text-white">Cho phép</strong>.
+                  </>
+                )}
               </p>
             </div>
+            {!cameraBlockedReason && (
+              <button
+                type="button"
+                onClick={requestStartScanner}
+                className="flex items-center gap-3 rounded-2xl px-10 py-4 text-lg font-bold text-white transition-transform hover:scale-105"
+                style={{
+                  background: `linear-gradient(135deg, ${ACCENT}, #c00030)`,
+                }}
+              >
+                <QrCode size={24} />
+                Bắt đầu quét QR
+              </button>
+            )}
             <button
-              onClick={startScanner}
-              className="flex items-center gap-3 rounded-2xl px-10 py-4 text-lg font-bold text-white transition-transform hover:scale-105"
-              style={{
-                background: `linear-gradient(135deg, ${ACCENT}, #c00030)`,
-              }}
+              type="button"
+              onClick={() => setShowManualInput((v) => !v)}
+              className="flex items-center gap-2 text-sm font-medium"
+              style={{ color: '#8892a0' }}
             >
-              <QrCode size={24} />
-              Bắt đầu quét QR
+              <Keyboard size={16} />
+              {showManualInput
+                ? 'Ẩn nhập mã thủ công'
+                : 'Nhập mã vé thủ công (test)'}
             </button>
           </div>
         )}
 
         {(scanState === 'scanning' || scanState === 'processing') && (
           <div className="flex w-full max-w-lg flex-col items-center gap-4">
-            <div
-              id={SCANNER_ID}
-              className="w-full overflow-hidden rounded-2xl"
-              style={{ border: '2px solid rgba(255,56,92,0.3)' }}
-            />
             {scanState === 'processing' && (
               <div className="flex items-center gap-2 text-sm font-medium text-white">
                 <Loader2
@@ -279,6 +445,7 @@ export default function KioskCheckinPage() {
               </p>
             )}
             <button
+              type="button"
               onClick={resetToScan}
               className="rounded-xl px-6 py-2 text-sm font-semibold text-white hover:bg-white/5"
               style={{ border: '1px solid rgba(255,255,255,0.1)' }}
@@ -319,6 +486,7 @@ export default function KioskCheckinPage() {
               <Row label="Khởi hành" value={result.departureTime} />
             </div>
             <button
+              type="button"
               onClick={resetToScan}
               className="mt-6 w-full rounded-xl py-3 text-sm font-bold text-white"
               style={{ backgroundColor: '#10B981' }}
@@ -346,6 +514,7 @@ export default function KioskCheckinPage() {
               {errorMsg}
             </p>
             <button
+              type="button"
               onClick={resetToScan}
               className="mt-6 rounded-xl px-8 py-3 text-sm font-bold text-white"
               style={{ backgroundColor: ACCENT }}
@@ -353,6 +522,39 @@ export default function KioskCheckinPage() {
               Thử lại
             </button>
           </div>
+        )}
+
+        {showManualInput && scanState !== 'success' && (
+          <form
+            onSubmit={handleManualSubmit}
+            className="w-full max-w-md rounded-2xl p-5"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <p className="mb-3 text-sm font-semibold text-white">
+              Nhập mã vé / dán nội dung QR
+            </p>
+            <input
+              value={manualCode}
+              onChange={(e) => setManualCode(e.target.value)}
+              placeholder="VD: A1B2C3D4 hoặc booking UUID"
+              className="w-full rounded-xl border px-4 py-3 text-sm text-white outline-none"
+              style={{
+                borderColor: 'rgba(255,255,255,0.12)',
+                backgroundColor: 'rgba(0,0,0,0.25)',
+              }}
+            />
+            <button
+              type="submit"
+              disabled={!manualCode.trim() || scanState === 'processing'}
+              className="mt-3 w-full rounded-xl py-3 text-sm font-bold text-white disabled:opacity-50"
+              style={{ backgroundColor: ACCENT }}
+            >
+              Xác nhận check-in
+            </button>
+          </form>
         )}
       </main>
     </div>
