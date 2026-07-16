@@ -36,6 +36,7 @@ export const routeName = Object.freeze({
   adminPromotions: '/admin/promotions',
   adminRevenue: '/admin/revenue',
   adminTopTours: '/admin/top-tours',
+  adminTourApprovals: '/admin/tour-approvals',
   adminBoats: '/admin/boats',
   adminReviews: '/admin/reviews',
   adminFaqs: '/admin/faqs',
