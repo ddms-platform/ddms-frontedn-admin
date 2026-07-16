@@ -6,6 +6,7 @@ import {
   Tag,
   BarChart3,
   Star,
+  CheckCircle,
   Bell,
   ScrollText,
   Ship,
@@ -74,6 +75,11 @@ export const adminSidelinks: SideLink[] = [
     title: 'adminLayout.nav.topTours',
     href: routeName.adminTopTours,
     icon: <Star size={20} />,
+  },
+  {
+    title: 'adminLayout.nav.tourApprovals',
+    href: routeName.adminTourApprovals,
+    icon: <CheckCircle size={20} />,
   },
   {
     title: 'adminLayout.nav.boats',
