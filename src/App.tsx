@@ -24,6 +24,9 @@ const AdminDocks = lazy(() => import('@/pages/admin/docks/index'));
 const AdminPromotions = lazy(() => import('@/pages/admin/promotions/index'));
 const AdminRevenue = lazy(() => import('@/pages/admin/revenue/index'));
 const AdminTopTours = lazy(() => import('@/pages/admin/top-tours/index'));
+const AdminTourApprovals = lazy(
+  () => import('@/pages/admin/tour-approvals/index'),
+);
 const AdminBoats = lazy(() => import('@/pages/admin/boats/index'));
 const AdminReviews = lazy(() => import('@/pages/admin/reviews/index'));
 const AdminFaqs = lazy(() => import('@/pages/admin/faqs/index'));
@@ -147,6 +150,14 @@ function App() {
                     element={
                       <Suspense fallback={<PageLoader />}>
                         <AdminTopTours />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminTourApprovals}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminTourApprovals />
                       </Suspense>
                     }
                   />
