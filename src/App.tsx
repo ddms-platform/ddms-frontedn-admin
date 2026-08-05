@@ -10,6 +10,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { routeName } from '@/constants/route-name';
 import { Toaster } from '@/components/ui/sonner';
+import { AdminSosAlertWidget } from '@/components/sos/AdminSosAlertWidget';
 
 const SignInPage = lazy(() => import('@/pages/auth/sign-in'));
 const SignUpPage = lazy(() => import('@/pages/auth/sign-up'));
@@ -38,6 +39,7 @@ const AdminApprovals = lazy(() => import('@/pages/admin/approvals/index'));
 const AdminLegalCompliance = lazy(
   () => import('@/pages/admin/legal-compliance/index'),
 );
+const AdminSosPage = lazy(() => import('@/pages/admin/sos/index'));
 const KioskCheckinPage = lazy(() => import('@/pages/kiosk-checkin/index'));
 
 // ── Owner pages ──────────────────────────────────────────────────────────────
@@ -55,6 +57,7 @@ function App() {
         <AuthProvider>
           <LanguageProvider>
             <Toaster position="top-right" richColors closeButton />
+            <AdminSosAlertWidget />
             <Routes>
               {/* Auth Routes - own layout, no header/footer */}
               <Route element={<AuthLayout />}>
@@ -102,6 +105,14 @@ function App() {
                     element={
                       <Suspense fallback={<PageLoader />}>
                         <AdminDashboard />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminSos}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminSosPage />
                       </Suspense>
                     }
                   />
