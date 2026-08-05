@@ -136,12 +136,18 @@ export default function AdminTourApprovals() {
   }, []);
 
   const stats = useMemo(() => {
-    const pending = tours.filter((t) => normalizeStatus(t.status) === 'pending');
+    const pending = tours.filter(
+      (t) => normalizeStatus(t.status) === 'pending',
+    );
     const active = tours.filter((t) =>
       ['active', 'approved'].includes(normalizeStatus(t.status)),
     );
-    const rejected = tours.filter((t) => normalizeStatus(t.status) === 'rejected');
-    const inactive = tours.filter((t) => normalizeStatus(t.status) === 'inactive');
+    const rejected = tours.filter(
+      (t) => normalizeStatus(t.status) === 'rejected',
+    );
+    const inactive = tours.filter(
+      (t) => normalizeStatus(t.status) === 'inactive',
+    );
 
     return {
       total: tours.length,
@@ -172,7 +178,9 @@ export default function AdminTourApprovals() {
   }, [filter, search, tours]);
 
   const handleApprove = async (tour: TourApprovalItem) => {
-    if (!confirm(`Duyệt tour "${tour.name || 'không tên'}" để được kinh doanh?`)) {
+    if (
+      !confirm(`Duyệt tour "${tour.name || 'không tên'}" để được kinh doanh?`)
+    ) {
       return;
     }
 
@@ -349,7 +357,9 @@ export default function AdminTourApprovals() {
                   onClick={() => setFilter(key as StatusFilter)}
                   className="rounded-xl px-3 py-2 text-sm font-semibold transition-colors"
                   style={{
-                    backgroundColor: isActive ? ACCENT : 'rgba(255,255,255,0.04)',
+                    backgroundColor: isActive
+                      ? ACCENT
+                      : 'rgba(255,255,255,0.04)',
                     color: isActive ? '#fff' : '#c8d0e0',
                   }}
                 >

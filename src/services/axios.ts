@@ -62,6 +62,14 @@ Axios.interceptors.response.use(
   },
 );
 
+Axios.interceptors.request.use((config) => {
+  const token = localStorageService.getItem(localStorageKey.ACCESS_TOKEN);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 api.interceptors.request.use((config) => {
   const token = localStorageService.getItem(localStorageKey.ACCESS_TOKEN);
   if (token) {

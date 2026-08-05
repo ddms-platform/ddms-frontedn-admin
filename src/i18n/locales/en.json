@@ -784,7 +784,64 @@
     "genericError": "Something went wrong",
     "validation": {
       "namesRequired": "Please enter Vietnamese and English names",
-      "codeRequired": "Please enter a type code"
+      "codeRequired": "Please enter certificate type code"
+    }
+  },
+  "sos": {
+    "centerTitle": "Emergency SOS Response Center",
+    "needRescue": "RESCUE NEEDED",
+    "centerSubtitle": "Real-time GPS position tracking and sea emergency alert system",
+    "refreshData": "Refresh Data",
+    "allSignals": "All Signals",
+    "unresolved": "Unresolved",
+    "resolved": "Resolved",
+    "display": "Display:",
+    "perPage": "items / page",
+    "loadingData": "Connecting & loading SOS alert data...",
+    "noAlertsTitle": "No SOS alerts recorded",
+    "noAlertsDesc": "All alarm data is synced in real-time from Database. When Captain triggers an SOS signal, it will immediately appear here.",
+    "urgentUnresolved": "URGENT - UNRESOLVED",
+    "dispatchRescue": "RESCUE DISPATCHED",
+    "deleteAlert": "Delete SOS record",
+    "captain": "Captain",
+    "noCaptainName": "Captain",
+    "phone": "Phone Number",
+    "noPhone": "No phone updated",
+    "boat": "Tourist Boat",
+    "gpsCoords": "SOS GPS Coordinates",
+    "description": "Description",
+    "openMaps": "Open Maps",
+    "viewMaps": "View Maps",
+    "confirmRescued": "Confirm Rescued",
+    "resolving": "Processing...",
+    "pageShowing": "Showing Page {{page}} / {{totalPages}} ({{totalItems}} records)",
+    "confirmDeleteTitle": "Confirm Delete SOS Signal",
+    "confirmDeleteDesc": "Are you sure you want to permanently delete this SOS record from the Database? This action cannot be undone.",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "deleteRecord": "Delete Record",
+    "widget": {
+      "enableSiren": "Activate SOS Siren",
+      "turnOnSiren": "TURN ON SIREN",
+      "unmuteSiren": "Unmute Siren",
+      "muteSiren": "Mute Siren",
+      "realtimeTitle": "REAL-TIME SOS ALERT - EMERGENCY RESCUE REQUESTED ({{count}} INCIDENTS)",
+      "realtimeSubtitle": "Emergency distress signal from Captain at Da Nang sea",
+      "urgentAlert": "EMERGENCY ALERT",
+      "urgentIssue": "URGENT RESCUE REQUIRED"
+    },
+    "button": {
+      "triggerSos": "TRIGGER EMERGENCY SOS",
+      "modalTitle": "TRIGGER EMERGENCY SOS",
+      "modalSubtitle": "GPS position and incident details will be transmitted directly to Da Nang Port Authority",
+      "gettingLocation": "Acquiring real-time GPS coordinates...",
+      "locationSuccess": "GPS coordinates acquired accurately",
+      "notePlaceholder": "Incident description (e.g. Engine failure, hull breach, water leak...)",
+      "confirmTrigger": "CONFIRM SEND EMERGENCY SOS",
+      "sending": "Transmitting SOS signal...",
+      "activeTitle": "EMERGENCY SOS SIGNAL BROADCASTED",
+      "activeDesc": "Port Authority center has received your distress signal and emergency sirens are sounding at the control center.",
+      "standby": "Please stay calm, keep your phone reachable, and remain in a safe location!"
     }
   }
 }

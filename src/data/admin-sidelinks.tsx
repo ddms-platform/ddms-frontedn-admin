@@ -17,6 +17,7 @@ import {
   ClipboardCheck,
   Scale,
   QrCode,
+  Radio,
 } from 'lucide-react';
 import type { JSX } from 'react';
 import { routeName } from '@/constants/route-name';
@@ -40,6 +41,11 @@ export const adminSidelinks: SideLink[] = [
     href: routeName.admin,
     icon: <LayoutDashboard size={20} />,
     end: true,
+  },
+  {
+    title: 'Ứng cứu SOS',
+    href: routeName.adminSos,
+    icon: <Radio size={20} className="text-red-500 animate-pulse" />,
   },
   {
     title: 'adminLayout.nav.kioskCheckin',
