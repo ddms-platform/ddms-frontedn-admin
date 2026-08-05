@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ShieldAlert,
   Volume2,
@@ -15,6 +16,7 @@ import { sosService, type SosAlert } from '@/services/sosService';
 import { sosSignalRService } from '@/services/sosSignalRService';
 
 export const AdminSosAlertWidget: React.FC = () => {
+  const { t } = useTranslation();
   const [activeAlerts, setActiveAlerts] = useState<SosAlert[]>([]);
   const [currentAlert, setCurrentAlert] = useState<SosAlert | null>(null);
   const [isAudioMuted, setIsAudioMuted] = useState(false);
@@ -216,7 +218,7 @@ export const AdminSosAlertWidget: React.FC = () => {
           className="fixed bottom-4 right-4 z-99999 bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 shadow-xl flex items-center gap-2 transition cursor-pointer"
         >
           <Bell className="w-4 h-4 text-yellow-400 animate-pulse" />
-          <span>Kích hoạt còi báo SOS</span>
+          <span>{t('sos.widget.enableSiren')}</span>
         </button>
       ) : null
     );
@@ -235,11 +237,10 @@ export const AdminSosAlertWidget: React.FC = () => {
           <ShieldAlert className="w-7 h-7 text-yellow-300 animate-bounce" />
           <div>
             <h3 className="font-black tracking-wider text-base uppercase">
-              CẢNH BÁO SOS THỜI GIAN THỰC - YÊU CẦU CỨU HỘ KHẨN CẤP (
-              {activeAlerts.length} SỰ CỐ)
+              {t('sos.widget.realtimeTitle', { count: activeAlerts.length })}
             </h3>
             <p className="text-xs text-red-100 font-medium">
-              Tín hiệu nguy cấp từ Thuyền trưởng trên biển Đà Nẵng
+              {t('sos.widget.realtimeSubtitle')}
             </p>
           </div>
         </div>
@@ -251,7 +252,7 @@ export const AdminSosAlertWidget: React.FC = () => {
               className="px-3 py-1.5 bg-yellow-400 text-slate-900 font-black rounded-lg text-xs animate-bounce shadow-lg flex items-center gap-1.5 cursor-pointer"
             >
               <Volume2 className="w-4 h-4" />
-              <span>BẬT CÒI BÁO ĐỘNG</span>
+              <span>{t('sos.widget.turnOnSiren')}</span>
             </button>
           )}
 
@@ -264,7 +265,11 @@ export const AdminSosAlertWidget: React.FC = () => {
             ) : (
               <Volume2 className="w-4 h-4 text-yellow-300 animate-bounce" />
             )}
-            <span>{isAudioMuted ? 'Mở Tiếng Còi' : 'Tắt Tiếng Còi'}</span>
+            <span>
+              {isAudioMuted
+                ? t('sos.widget.unmuteSiren')
+                : t('sos.widget.muteSiren')}
+            </span>
           </button>
         </div>
       </div>
@@ -282,10 +287,10 @@ export const AdminSosAlertWidget: React.FC = () => {
               </div>
               <div>
                 <span className="px-2.5 py-0.5 bg-red-600/40 text-red-300 border border-red-500/40 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
-                  CẢNH BÁO KHẨN CẤP
+                  {t('sos.widget.urgentAlert')}
                 </span>
                 <h2 className="text-xl font-black text-white mt-1">
-                  SỰ CỐ CẦN ỨNG CỨU GẤP
+                  {t('sos.widget.urgentIssue')}
                 </h2>
               </div>
             </div>
@@ -300,30 +305,34 @@ export const AdminSosAlertWidget: React.FC = () => {
             <div className="flex items-center justify-between bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
               <div className="flex items-center gap-2.5">
                 <User className="w-4 h-4 text-cyan-400" />
-                <span className="text-slate-400 text-xs">Thuyền trưởng:</span>
+                <span className="text-slate-400 text-xs">
+                  {t('sos.captain')}:
+                </span>
               </div>
               <span className="font-bold text-white">
-                {currentAlert.user_name || 'Đang cập nhật'}
+                {currentAlert.user_name || t('sos.noCaptainName')}
               </span>
             </div>
 
             <div className="flex items-center justify-between bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-emerald-400" />
-                <span className="text-slate-400 text-xs">Số điện thoại:</span>
+                <span className="text-slate-400 text-xs">
+                  {t('sos.phone')}:
+                </span>
               </div>
               <span className="font-bold text-emerald-300 font-mono">
-                {currentAlert.user_phone || 'Chưa có SĐT'}
+                {currentAlert.user_phone || t('sos.noPhone')}
               </span>
             </div>
 
             <div className="flex items-center justify-between bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
               <div className="flex items-center gap-2.5">
                 <Anchor className="w-4 h-4 text-blue-400" />
-                <span className="text-slate-400 text-xs">Tàu du lịch:</span>
+                <span className="text-slate-400 text-xs">{t('sos.boat')}:</span>
               </div>
               <span className="font-bold text-cyan-200">
-                {currentAlert.boat_name || 'Tàu du lịch'} (
+                {currentAlert.boat_name || t('sos.boat')} (
                 {currentAlert.registration_number || 'SỐ HIỆU ĐN'})
               </span>
             </div>
@@ -332,7 +341,7 @@ export const AdminSosAlertWidget: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <MapPin className="w-5 h-5 text-rose-400 animate-bounce" />
                 <span className="text-rose-200 text-xs font-bold">
-                  Tọa độ GPS phát SOS:
+                  {t('sos.gpsCoords')}:
                 </span>
               </div>
               <span className="font-mono font-black text-white text-sm">
@@ -343,7 +352,9 @@ export const AdminSosAlertWidget: React.FC = () => {
 
             {currentAlert.note && (
               <p className="text-xs text-slate-300 bg-slate-950/80 p-3 rounded-2xl border border-slate-800 leading-relaxed">
-                <span className="text-red-400 font-bold">Ghi chú: </span>
+                <span className="text-red-400 font-bold">
+                  {t('sos.description')}:{' '}
+                </span>
                 {currentAlert.note}
               </p>
             )}
@@ -358,7 +369,7 @@ export const AdminSosAlertWidget: React.FC = () => {
               className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition border border-cyan-500/30 shadow-lg"
             >
               <ExternalLink className="w-4 h-4" />
-              <span>Xem Bản Đồ Maps</span>
+              <span>{t('sos.viewMaps')}</span>
             </a>
 
             <button
@@ -366,7 +377,7 @@ export const AdminSosAlertWidget: React.FC = () => {
               className="flex-1 py-3 px-4 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 shadow-xl transition cursor-pointer"
             >
               <CheckCircle className="w-4 h-4" />
-              <span>Xác Nhận Đã Cứu Hộ</span>
+              <span>{t('sos.confirmRescued')}</span>
             </button>
           </div>
         </div>
