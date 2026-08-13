@@ -17,6 +17,7 @@ const SignUpPage = lazy(() => import('@/pages/auth/sign-up'));
 
 // ── Admin pages ──────────────────────────────────────────────────────────────
 const AdminDashboard = lazy(() => import('@/pages/admin/index'));
+const AdminOps = lazy(() => import('@/pages/admin/ops/index'));
 const AdminUsers = lazy(() => import('@/pages/admin/users/index'));
 const AdminOwnerVerification = lazy(
   () => import('@/pages/admin/owner-verification/index'),
@@ -113,6 +114,14 @@ function App() {
                     element={
                       <Suspense fallback={<PageLoader />}>
                         <AdminSosPage />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path={routeName.adminOps}
+                    element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminOps />
                       </Suspense>
                     }
                   />

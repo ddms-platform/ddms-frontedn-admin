@@ -260,18 +260,22 @@ export default function AdminDashboard() {
               Xem chi tiết →
             </Link>
           </div>
-          <div className="flex items-end gap-2 h-40">
+          <div className="flex items-end gap-2 h-48">
             {data.revenueBars.map((val, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+              <div
+                key={i}
+                className="flex-1 h-full flex flex-col justify-end items-center gap-1"
+              >
                 <div
                   className="w-full rounded-t-md hover:opacity-80 transition-all"
+                  title={`${data.months[i]}: ${val} triệu VND`}
                   style={{
-                    height: `${(val / maxBar) * 100}%`,
-                    minHeight: 4,
+                    height: `${Math.max((val / maxBar) * 100, 2)}%`,
+                    minHeight: 6,
                     background:
                       i === data.revenueBars.length - 1
                         ? `linear-gradient(180deg,${ACCENT},#c00030)`
-                        : 'rgba(255,56,92,0.3)',
+                        : 'rgba(255,56,92,0.35)',
                   }}
                 />
                 <span className="text-[9px]" style={{ color: '#8892a0' }}>
