@@ -412,7 +412,7 @@ export default function AdminTourApprovals() {
             <tbody>
               {filteredTours.map((tour) => {
                 const status = normalizeStatus(tour.status);
-                const canReview = status === 'pending' || status === 'rejected';
+                const canReview = status === 'pending';
                 const isProcessing = processingId === tour.id;
 
                 return (

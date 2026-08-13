@@ -18,6 +18,7 @@ import {
   Scale,
   QrCode,
   Radio,
+  Sparkles,
 } from 'lucide-react';
 import type { JSX } from 'react';
 import { routeName } from '@/constants/route-name';
@@ -41,6 +42,11 @@ export const adminSidelinks: SideLink[] = [
     href: routeName.admin,
     icon: <LayoutDashboard size={20} />,
     end: true,
+  },
+  {
+    title: 'Ops Command (AI)',
+    href: routeName.adminOps,
+    icon: <Sparkles size={20} className="text-fuchsia-400" />,
   },
   {
     title: 'Ứng cứu SOS',
