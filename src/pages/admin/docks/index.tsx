@@ -373,6 +373,7 @@ export default function AdminDocks() {
   const [selectedDockId, setSelectedDockId] = useState<string>('');
   const [schedules, setSchedules] = useState<DockScheduleResponse[]>([]);
   const [schedulesLoading, setSchedulesLoading] = useState(false);
+  const [availableBerths, setAvailableBerths] = useState<string[]>([]);
   const [allBoats, setAllBoats] = useState<BoatListItemResponse[]>([]);
   const [selectedBoatDetails, setSelectedBoatDetails] = useState<any | null>(
     null,
@@ -418,6 +419,33 @@ export default function AdminDocks() {
     }
   };
 
+  const fetchBerths = async (dockId: string) => {
+    if (!dockId) return;
+    try {
+      const res = await dockApi.getBerths(dockId);
+      if (res.status === 200 && res.data?.result) {
+        setAvailableBerths(res.data.result);
+      }
+    } catch (error) {
+      console.error('Khong the tai danh sach khoang:', error);
+    }
+  };
+
+  /** Cang vu gan khoang cho mot lich neo. Chuoi rong = go khoang. */
+  const handleAssignBerth = async (
+    dockScheduleId: string,
+    berthCode: string,
+  ) => {
+    try {
+      await dockApi.assignBerth(dockScheduleId, berthCode || null);
+      await fetchSchedules(selectedDockId);
+    } catch (error: any) {
+      // Server chan khi khoang khong co tren so do, vuot suc chua ben, hoac da
+      // co tau khac dau trong cung khoang thoi gian.
+      alert(error?.message ?? 'Khong gan duoc khoang neo.');
+    }
+  };
+
   const fetchAllBoats = async () => {
     try {
       const res = await boatApi.getAll();
@@ -438,6 +466,7 @@ export default function AdminDocks() {
   useEffect(() => {
     if (viewMode === 'map' && selectedDockId) {
       fetchSchedules(selectedDockId);
+      fetchBerths(selectedDockId);
     }
   }, [viewMode, selectedDockId]);
 
@@ -500,8 +529,12 @@ export default function AdminDocks() {
     });
 
     return active
-      .map((schedule, idx) => {
-        const slot = ALL_SLOTS[idx % ALL_SLOTS.length];
+      .map((schedule) => {
+        // Khoang do cang vu gan va luu trong DB. Truoc day suy ra tu vi tri
+        // trong mang, nen cung mot con tau ra khoang khac nhau giua trang nay
+        // (duyet moi tau) va trang owner (chi loc tau cua minh), va con tu doi
+        // moi khi co tau khac vao hoac roi ben.
+        const slot = ALL_SLOTS.find((sl) => sl.id === schedule.berthCode);
         if (!slot) return null;
 
         const boatDetail = allBoats.find((b) => b.id === schedule.boatId);
@@ -1308,6 +1341,25 @@ export default function AdminDocks() {
                             <span className="font-bold text-rose-500 bg-rose-500/10 px-1 rounded-sm">
                               Khoang {boat.slotName}
                             </span>
+                            <select
+                              value={boat.slotName ?? ''}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                void handleAssignBerth(
+                                  boat.scheduleId,
+                                  e.target.value,
+                                );
+                              }}
+                              className="border border-gray-200 rounded-sm bg-white px-1 text-[10px]"
+                              title="Doi khoang neo"
+                            >
+                              <option value="">- chua gan -</option>
+                              {availableBerths.map((code) => (
+                                <option key={code} value={code}>
+                                  {code}
+                                </option>
+                              ))}
+                            </select>
                             <span>•</span>
                             <span className="truncate">
                               {formatScheduleTime(boat.startTime)}
