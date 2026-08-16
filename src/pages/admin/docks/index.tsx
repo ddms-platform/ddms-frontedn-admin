@@ -534,8 +534,11 @@ export default function AdminDocks() {
         // trong mang, nen cung mot con tau ra khoang khac nhau giua trang nay
         // (duyet moi tau) va trang owner (chi loc tau cua minh), va con tu doi
         // moi khi co tau khac vao hoac roi ben.
+        //
+        // Tau CHUA duoc gan khoang van phai co trong mang nay: danh sach ben
+        // phai lay tu day, va o chon khoang nam trong danh sach do. Loai chung
+        // ra thi khong con duong nao gan khoang cho chung nua.
         const slot = ALL_SLOTS.find((sl) => sl.id === schedule.berthCode);
-        if (!slot) return null;
 
         const boatDetail = allBoats.find((b) => b.id === schedule.boatId);
 
@@ -543,11 +546,11 @@ export default function AdminDocks() {
           ...boatDetail,
           id: schedule.boatId,
           name: schedule.boatName || boatDetail?.name || 'Tàu không tên',
-          slotName: slot.id,
-          x: slot.x,
-          y: slot.y,
-          rotate: slot.rotate,
-          pier: slot.pier,
+          slotName: slot?.id ?? null,
+          x: slot?.x ?? null,
+          y: slot?.y ?? null,
+          rotate: slot?.rotate ?? 0,
+          pier: slot?.pier ?? null,
           scheduleId: schedule.id,
           startTime: schedule.startTime,
           endTime: schedule.endTime,
@@ -1338,8 +1341,16 @@ export default function AdminDocks() {
                             {boat.name}
                           </div>
                           <div className="text-[10px] text-gray-500 flex items-center gap-1.5 mt-0.5">
-                            <span className="font-bold text-rose-500 bg-rose-500/10 px-1 rounded-sm">
-                              Khoang {boat.slotName}
+                            <span
+                              className={`font-bold px-1 rounded-sm ${
+                                boat.slotName
+                                  ? 'text-rose-500 bg-rose-500/10'
+                                  : 'text-amber-600 bg-amber-500/10'
+                              }`}
+                            >
+                              {boat.slotName
+                                ? `Khoang ${boat.slotName}`
+                                : 'Chua gan khoang'}
                             </span>
                             <select
                               value={boat.slotName ?? ''}
