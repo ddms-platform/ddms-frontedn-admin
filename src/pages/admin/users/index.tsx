@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Api } from '@/services/axios';
 import { toast } from 'sonner';
+import Pagination from '@/components/shared/pagination';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -62,6 +63,10 @@ export default function AdminUsers() {
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | Role>('all');
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // Role Assignment states
   const [showRolesModal, setShowRolesModal] = useState(false);
@@ -143,6 +148,10 @@ export default function AdminUsers() {
     }
   };
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filterRole]);
+
   const filtered = users.filter((u) => {
     const matchSearch =
       (u.fullName || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -150,6 +159,12 @@ export default function AdminUsers() {
     const matchRole = filterRole === 'all' || u.roles.includes(filterRole);
     return matchSearch && matchRole;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paginatedUsers = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   if (isLoading) {
     return (
@@ -284,7 +299,7 @@ export default function AdminUsers() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((u) => (
+              {paginatedUsers.map((u) => (
                 <tr
                   key={u.id}
                   className="border-b hover:bg-white/2 transition-colors"
@@ -428,6 +443,53 @@ export default function AdminUsers() {
           <p className="py-12 text-center text-sm" style={{ color: '#8892a0' }}>
             Không tìm thấy người dùng nào
           </p>
+        )}
+
+        {/* Pagination Bar */}
+        {filtered.length > 0 && (
+          <div
+            className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t"
+            style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+          >
+            <div
+              className="flex items-center gap-3 text-xs"
+              style={{ color: '#8892a0' }}
+            >
+              <span>
+                Hiển thị{' '}
+                <strong style={{ color: '#fff' }}>
+                  {(currentPage - 1) * pageSize + 1} -{' '}
+                  {Math.min(currentPage * pageSize, filtered.length)}
+                </strong>{' '}
+                trên tổng số{' '}
+                <strong style={{ color: '#fff' }}>{filtered.length}</strong>{' '}
+                người dùng
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                style={{
+                  backgroundColor: '#141e35',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                }}
+              >
+                <option value={10}>10 / trang</option>
+                <option value={20}>20 / trang</option>
+                <option value={50}>50 / trang</option>
+              </select>
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         )}
       </div>
 

@@ -843,5 +843,8 @@
       "activeDesc": "Port Authority center has received your distress signal and emergency sirens are sounding at the control center.",
       "standby": "Please stay calm, keep your phone reachable, and remain in a safe location!"
     }
+  },
+  "error": {
+    "USER_DISABLED": "Your account has been disabled or suspended. Please contact the administrator."
   }
 }

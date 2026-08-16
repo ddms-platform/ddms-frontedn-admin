@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Star, Trash2, Search, MessageSquare } from 'lucide-react';
+import Pagination from '@/components/shared/pagination';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -87,6 +88,10 @@ export default function AdminReviews() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'flagged' | 'low'>('all');
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
   const filtered = REVIEWS.filter((r) => {
     const matchSearch =
       r.customer.toLowerCase().includes(search.toLowerCase()) ||
@@ -99,6 +104,12 @@ export default function AdminReviews() {
           : r.rating <= 2;
     return matchSearch && matchFilter;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paginatedReviews = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   const avg = (
     REVIEWS.reduce((s, r) => s + r.rating, 0) / REVIEWS.length
@@ -179,7 +190,10 @@ export default function AdminReviews() {
           />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Tìm theo khách hàng, tour..."
             className="w-full rounded-xl py-2.5 pl-9 pr-4 text-sm outline-none"
             style={{
@@ -199,7 +213,10 @@ export default function AdminReviews() {
           ).map(([v, l]) => (
             <button
               key={v}
-              onClick={() => setFilter(v)}
+              onClick={() => {
+                setFilter(v);
+                setCurrentPage(1);
+              }}
               className="rounded-xl px-4 py-2 text-xs font-semibold transition-all"
               style={
                 filter === v
@@ -219,7 +236,7 @@ export default function AdminReviews() {
 
       {/* Reviews list */}
       <div className="space-y-3">
-        {filtered.map((r) => (
+        {paginatedReviews.map((r) => (
           <div
             key={r.id}
             className="rounded-2xl p-5 space-y-3 transition-all hover:scale-[1.005]"
@@ -295,6 +312,53 @@ export default function AdminReviews() {
           <p className="text-center py-12 text-sm" style={{ color: '#8892a0' }}>
             Không có đánh giá nào
           </p>
+        )}
+
+        {/* Pagination Bar */}
+        {filtered.length > 0 && (
+          <div
+            className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl"
+            style={CARD}
+          >
+            <div
+              className="flex items-center gap-3 text-xs"
+              style={{ color: '#8892a0' }}
+            >
+              <span>
+                Hiển thị{' '}
+                <strong style={{ color: '#fff' }}>
+                  {(currentPage - 1) * pageSize + 1} -{' '}
+                  {Math.min(currentPage * pageSize, filtered.length)}
+                </strong>{' '}
+                trên tổng số{' '}
+                <strong style={{ color: '#fff' }}>{filtered.length}</strong>{' '}
+                đánh giá
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                style={{
+                  backgroundColor: '#141e35',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                }}
+              >
+                <option value={5}>5 / trang</option>
+                <option value={10}>10 / trang</option>
+                <option value={20}>20 / trang</option>
+              </select>
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         )}
       </div>
     </div>

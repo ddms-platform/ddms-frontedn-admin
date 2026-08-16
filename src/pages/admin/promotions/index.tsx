@@ -20,6 +20,7 @@ import type {
 } from '@/services/promotions-api';
 import { toast } from 'sonner';
 import DateInput from '@/components/ui/date-input';
+import Pagination from '@/components/shared/pagination';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -33,6 +34,12 @@ export default function AdminPromotions() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('admin');
   const [promotions, setPromotions] = useState<PromotionResponse[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination states
+  const [adminPage, setAdminPage] = useState(1);
+  const [adminPageSize, setAdminPageSize] = useState(10);
+  const [ownerPage, setOwnerPage] = useState(1);
+  const [ownerPageSize, setOwnerPageSize] = useState(10);
 
   // Form states
   const [showForm, setShowForm] = useState(false);
@@ -261,6 +268,24 @@ export default function AdminPromotions() {
   );
   const ownerPromos = promotions.filter((p) => p.creatorRole === 'owner');
 
+  const adminTotalPages = Math.max(
+    1,
+    Math.ceil(adminPromos.length / adminPageSize),
+  );
+  const paginatedAdminPromos = adminPromos.slice(
+    (adminPage - 1) * adminPageSize,
+    adminPage * adminPageSize,
+  );
+
+  const ownerTotalPages = Math.max(
+    1,
+    Math.ceil(ownerPromos.length / ownerPageSize),
+  );
+  const paginatedOwnerPromos = ownerPromos.slice(
+    (ownerPage - 1) * ownerPageSize,
+    ownerPage * ownerPageSize,
+  );
+
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -313,6 +338,7 @@ export default function AdminPromotions() {
         <button
           onClick={() => {
             setActiveTab('admin');
+            setAdminPage(1);
             resetForm();
           }}
           className={`pb-3 text-sm font-semibold tracking-wide transition-all border-b-2 flex items-center gap-2 ${
@@ -327,6 +353,7 @@ export default function AdminPromotions() {
         <button
           onClick={() => {
             setActiveTab('owner');
+            setOwnerPage(1);
             resetForm();
           }}
           className={`pb-3 text-sm font-semibold tracking-wide transition-all border-b-2 flex items-center gap-2 ${
@@ -543,7 +570,7 @@ export default function AdminPromotions() {
                     </td>
                   </tr>
                 ) : (
-                  adminPromos.map((p) => {
+                  paginatedAdminPromos.map((p) => {
                     const exhausted =
                       p.usageLimit !== null && p.usedCount >= p.usageLimit;
                     return (
@@ -643,6 +670,55 @@ export default function AdminPromotions() {
               </tbody>
             </table>
           </div>
+
+          {/* Admin Promos Pagination */}
+          {adminPromos.length > 0 && (
+            <div
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t"
+              style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+            >
+              <div
+                className="flex items-center gap-3 text-xs"
+                style={{ color: '#8892a0' }}
+              >
+                <span>
+                  Hiển thị{' '}
+                  <strong style={{ color: '#fff' }}>
+                    {(adminPage - 1) * adminPageSize + 1} -{' '}
+                    {Math.min(adminPage * adminPageSize, adminPromos.length)}
+                  </strong>{' '}
+                  trên tổng số{' '}
+                  <strong style={{ color: '#fff' }}>
+                    {adminPromos.length}
+                  </strong>{' '}
+                  mã
+                </span>
+                <select
+                  value={adminPageSize}
+                  onChange={(e) => {
+                    setAdminPageSize(Number(e.target.value));
+                    setAdminPage(1);
+                  }}
+                  className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                  style={{
+                    backgroundColor: '#141e35',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: '#fff',
+                  }}
+                >
+                  <option value={10}>10 / trang</option>
+                  <option value={20}>20 / trang</option>
+                  <option value={50}>50 / trang</option>
+                </select>
+              </div>
+
+              <Pagination
+                currentPage={adminPage}
+                totalPages={adminTotalPages}
+                onPageChange={setAdminPage}
+              />
+            </div>
+          )}
         </div>
       ) : (
         // Owner Table (Pending & History)
@@ -679,7 +755,7 @@ export default function AdminPromotions() {
                     </td>
                   </tr>
                 ) : (
-                  ownerPromos.map((p) => {
+                  paginatedOwnerPromos.map((p) => {
                     return (
                       <tr
                         key={p.id}
@@ -789,6 +865,55 @@ export default function AdminPromotions() {
               </tbody>
             </table>
           </div>
+
+          {/* Owner Promos Pagination */}
+          {ownerPromos.length > 0 && (
+            <div
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t"
+              style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+            >
+              <div
+                className="flex items-center gap-3 text-xs"
+                style={{ color: '#8892a0' }}
+              >
+                <span>
+                  Hiển thị{' '}
+                  <strong style={{ color: '#fff' }}>
+                    {(ownerPage - 1) * ownerPageSize + 1} -{' '}
+                    {Math.min(ownerPage * ownerPageSize, ownerPromos.length)}
+                  </strong>{' '}
+                  trên tổng số{' '}
+                  <strong style={{ color: '#fff' }}>
+                    {ownerPromos.length}
+                  </strong>{' '}
+                  yêu cầu
+                </span>
+                <select
+                  value={ownerPageSize}
+                  onChange={(e) => {
+                    setOwnerPageSize(Number(e.target.value));
+                    setOwnerPage(1);
+                  }}
+                  className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                  style={{
+                    backgroundColor: '#141e35',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: '#fff',
+                  }}
+                >
+                  <option value={10}>10 / trang</option>
+                  <option value={20}>20 / trang</option>
+                  <option value={50}>50 / trang</option>
+                </select>
+              </div>
+
+              <Pagination
+                currentPage={ownerPage}
+                totalPages={ownerTotalPages}
+                onPageChange={setOwnerPage}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -51,19 +51,23 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="flex h-10 w-10 items-center justify-center rounded-lg transition-all hover:shadow-md active:scale-[0.96] disabled:pointer-events-none disabled:opacity-30"
-        style={{ color: '#ffffff' }}
+        className="flex h-9 w-9 items-center justify-center rounded-xl transition-all hover:bg-white/5 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-25 cursor-pointer"
+        style={{
+          backgroundColor: '#0d1629',
+          border: '1px solid rgba(255,255,255,0.08)',
+          color: '#8892a0',
+        }}
         aria-label="Previous page"
       >
-        <ChevronLeft size={18} />
+        <ChevronLeft size={16} />
       </button>
 
       {pages.map((page, index) =>
         page === '...' ? (
           <span
             key={`ellipsis-${index}`}
-            className="flex h-10 w-10 items-center justify-center text-sm"
-            style={{ color: '#ecf0ff' }}
+            className="flex h-9 w-9 items-center justify-center text-xs"
+            style={{ color: '#8892a0' }}
           >
             ···
           </span>
@@ -71,10 +75,14 @@ export default function Pagination({
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-sm font-semibold transition-all hover:shadow-md active:scale-[0.96]"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-xs font-semibold transition-all hover:shadow-md active:scale-[0.96] cursor-pointer"
             style={{
-              backgroundColor: page === currentPage ? '#00F0FF' : 'transparent',
-              color: page === currentPage ? '#0A192F' : '#ecf0ff',
+              backgroundColor: page === currentPage ? '#FF385C' : '#0d1629',
+              border:
+                page === currentPage
+                  ? '1px solid #FF385C'
+                  : '1px solid rgba(255,255,255,0.08)',
+              color: page === currentPage ? '#ffffff' : '#8892a0',
             }}
             aria-label={`Page ${page}`}
             aria-current={page === currentPage ? 'page' : undefined}
@@ -87,11 +95,15 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="flex h-10 w-10 items-center justify-center rounded-lg transition-all hover:shadow-md active:scale-[0.96] disabled:pointer-events-none disabled:opacity-30"
-        style={{ color: '#ffffff' }}
+        className="flex h-9 w-9 items-center justify-center rounded-xl transition-all hover:bg-white/5 active:scale-[0.96] disabled:pointer-events-none disabled:opacity-25 cursor-pointer"
+        style={{
+          backgroundColor: '#0d1629',
+          border: '1px solid rgba(255,255,255,0.08)',
+          color: '#8892a0',
+        }}
         aria-label="Next page"
       >
-        <ChevronRight size={18} />
+        <ChevronRight size={16} />
       </button>
     </nav>
   );

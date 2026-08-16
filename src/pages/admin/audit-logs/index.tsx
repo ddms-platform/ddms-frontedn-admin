@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, ScrollText, Filter } from 'lucide-react';
+import Pagination from '@/components/shared/pagination';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -113,6 +114,10 @@ export default function AdminAuditLogs() {
   const [tableFilter, setTableFilter] = useState('Tất cả');
   const [expanded, setExpanded] = useState<number | null>(null);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   const filtered = LOGS.filter((l) => {
     const matchSearch =
       l.table.includes(search) ||
@@ -122,6 +127,12 @@ export default function AdminAuditLogs() {
     const matchTable = tableFilter === 'Tất cả' || l.table === tableFilter;
     return matchSearch && matchAction && matchTable;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paginatedLogs = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   return (
     <div className="px-4 py-6 lg:px-8 space-y-6">
@@ -177,7 +188,10 @@ export default function AdminAuditLogs() {
           />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Tìm theo bảng, actor, record ID..."
             className="w-full rounded-xl py-2.5 pl-9 pr-4 text-sm outline-none"
             style={{
@@ -197,7 +211,10 @@ export default function AdminAuditLogs() {
           {(['all', 'INSERT', 'UPDATE', 'DELETE'] as const).map((a) => (
             <button
               key={a}
-              onClick={() => setActionFilter(a)}
+              onClick={() => {
+                setActionFilter(a);
+                setCurrentPage(1);
+              }}
               className="rounded-xl px-3 py-1.5 text-xs font-semibold transition-all"
               style={
                 actionFilter === a
@@ -229,7 +246,10 @@ export default function AdminAuditLogs() {
           {TABLES.map((t) => (
             <button
               key={t}
-              onClick={() => setTableFilter(t)}
+              onClick={() => {
+                setTableFilter(t);
+                setCurrentPage(1);
+              }}
               className="rounded-xl px-3 py-1.5 text-xs font-semibold transition-all"
               style={
                 tableFilter === t
@@ -277,7 +297,7 @@ export default function AdminAuditLogs() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((log) => {
+              {paginatedLogs.map((log) => {
                 const info = ACTION_MAP[log.action];
                 return (
                   <>
@@ -400,6 +420,53 @@ export default function AdminAuditLogs() {
           <p className="text-center py-12 text-sm" style={{ color: '#8892a0' }}>
             Không có log nào phù hợp
           </p>
+        )}
+
+        {/* Pagination Bar */}
+        {filtered.length > 0 && (
+          <div
+            className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t"
+            style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+          >
+            <div
+              className="flex items-center gap-3 text-xs"
+              style={{ color: '#8892a0' }}
+            >
+              <span>
+                Hiển thị{' '}
+                <strong style={{ color: '#fff' }}>
+                  {(currentPage - 1) * pageSize + 1} -{' '}
+                  {Math.min(currentPage * pageSize, filtered.length)}
+                </strong>{' '}
+                trên tổng số{' '}
+                <strong style={{ color: '#fff' }}>{filtered.length}</strong>{' '}
+                nhật ký
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                style={{
+                  backgroundColor: '#141e35',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                }}
+              >
+                <option value={10}>10 / trang</option>
+                <option value={20}>20 / trang</option>
+                <option value={50}>50 / trang</option>
+              </select>
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         )}
       </div>
     </div>
