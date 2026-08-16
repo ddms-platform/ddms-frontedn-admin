@@ -7,6 +7,7 @@ import {
   ChevronUp,
   HelpCircle,
 } from 'lucide-react';
+import Pagination from '@/components/shared/pagination';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -64,10 +65,20 @@ export default function AdminFaqs() {
   const [showForm, setShowForm] = useState(false);
   const [filterCat, setFilterCat] = useState('Tất cả');
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
   const filtered =
     filterCat === 'Tất cả'
       ? FAQS
       : FAQS.filter((f) => f.category === filterCat);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paginatedFaqs = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   return (
     <div className="px-4 py-6 lg:px-8 space-y-6">
@@ -207,7 +218,10 @@ export default function AdminFaqs() {
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
-            onClick={() => setFilterCat(cat)}
+            onClick={() => {
+              setFilterCat(cat);
+              setCurrentPage(1);
+            }}
             className="rounded-xl px-4 py-2 text-xs font-semibold transition-all"
             style={
               filterCat === cat
@@ -226,7 +240,7 @@ export default function AdminFaqs() {
 
       {/* FAQ accordion */}
       <div className="space-y-3">
-        {filtered.map((faq) => (
+        {paginatedFaqs.map((faq) => (
           <div
             key={faq.id}
             className="rounded-2xl overflow-hidden transition-all hover:scale-[1.005]"
@@ -302,6 +316,59 @@ export default function AdminFaqs() {
             )}
           </div>
         ))}
+
+        {filtered.length === 0 && (
+          <p className="text-center py-12 text-sm" style={{ color: '#8892a0' }}>
+            Không tìm thấy câu hỏi nào
+          </p>
+        )}
+
+        {/* Pagination Bar */}
+        {filtered.length > 0 && (
+          <div
+            className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl"
+            style={CARD}
+          >
+            <div
+              className="flex items-center gap-3 text-xs"
+              style={{ color: '#8892a0' }}
+            >
+              <span>
+                Hiển thị{' '}
+                <strong style={{ color: '#fff' }}>
+                  {(currentPage - 1) * pageSize + 1} -{' '}
+                  {Math.min(currentPage * pageSize, filtered.length)}
+                </strong>{' '}
+                trên tổng số{' '}
+                <strong style={{ color: '#fff' }}>{filtered.length}</strong> câu
+                hỏi
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                style={{
+                  backgroundColor: '#141e35',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                }}
+              >
+                <option value={5}>5 / trang</option>
+                <option value={10}>10 / trang</option>
+                <option value={20}>20 / trang</option>
+              </select>
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

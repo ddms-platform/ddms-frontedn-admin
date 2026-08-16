@@ -10,6 +10,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import Pagination from '@/components/shared/pagination';
 import {
   tourApprovalApi,
   type TourApprovalItem,
@@ -111,6 +112,10 @@ export default function AdminTourApprovals() {
   const [filter, setFilter] = useState<StatusFilter>('pending');
   const [processingId, setProcessingId] = useState<string | null>(null);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   const fetchTours = () => {
     setLoading(true);
     tourApprovalApi
@@ -176,6 +181,16 @@ export default function AdminTourApprovals() {
       return matchStatus && matchSearch;
     });
   }, [filter, search, tours]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredTours.length / pageSize));
+  const paginatedTours = filteredTours.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   const handleApprove = async (tour: TourApprovalItem) => {
     if (
@@ -410,7 +425,7 @@ export default function AdminTourApprovals() {
               </tr>
             </thead>
             <tbody>
-              {filteredTours.map((tour) => {
+              {paginatedTours.map((tour) => {
                 const status = normalizeStatus(tour.status);
                 const canReview = status === 'pending';
                 const isProcessing = processingId === tour.id;
@@ -514,6 +529,55 @@ export default function AdminTourApprovals() {
                 xuất hiện tại đây.
               </p>
             </div>
+          </div>
+        )}
+
+        {/* Pagination Bar */}
+        {filteredTours.length > 0 && (
+          <div
+            className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t"
+            style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+          >
+            <div
+              className="flex items-center gap-3 text-xs"
+              style={{ color: '#8892a0' }}
+            >
+              <span>
+                Hiển thị{' '}
+                <strong style={{ color: '#fff' }}>
+                  {(currentPage - 1) * pageSize + 1} -{' '}
+                  {Math.min(currentPage * pageSize, filteredTours.length)}
+                </strong>{' '}
+                trên tổng số{' '}
+                <strong style={{ color: '#fff' }}>
+                  {filteredTours.length}
+                </strong>{' '}
+                tour
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                style={{
+                  backgroundColor: '#141e35',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                }}
+              >
+                <option value={10}>10 / trang</option>
+                <option value={20}>20 / trang</option>
+                <option value={50}>50 / trang</option>
+              </select>
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
         )}
       </div>

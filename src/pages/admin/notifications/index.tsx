@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Bell, Plus, Send, Users, User, CheckCircle } from 'lucide-react';
+import Pagination from '@/components/shared/pagination';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -41,6 +42,16 @@ export default function AdminNotifications() {
   const [showForm, setShowForm] = useState(false);
   const [targetType, setTargetType] = useState<'all' | 'specific'>('all');
   const [form, setForm] = useState({ title: '', body: '', userId: '' });
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
+  const totalPages = Math.max(1, Math.ceil(SENT.length / pageSize));
+  const paginatedSent = SENT.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   return (
     <div className="px-4 py-6 lg:px-8 space-y-6">
@@ -237,7 +248,7 @@ export default function AdminNotifications() {
             Lịch sử gửi
           </h2>
         </div>
-        {SENT.map((n) => {
+        {paginatedSent.map((n) => {
           const pct = Math.round((n.read / n.recipients) * 100);
           return (
             <div
@@ -333,6 +344,53 @@ export default function AdminNotifications() {
             </div>
           );
         })}
+
+        {/* Pagination Bar */}
+        {SENT.length > 0 && (
+          <div
+            className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t"
+            style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+          >
+            <div
+              className="flex items-center gap-3 text-xs"
+              style={{ color: '#8892a0' }}
+            >
+              <span>
+                Hiển thị{' '}
+                <strong style={{ color: '#fff' }}>
+                  {(currentPage - 1) * pageSize + 1} -{' '}
+                  {Math.min(currentPage * pageSize, SENT.length)}
+                </strong>{' '}
+                trên tổng số{' '}
+                <strong style={{ color: '#fff' }}>{SENT.length}</strong> thông
+                báo
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                style={{
+                  backgroundColor: '#141e35',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                }}
+              >
+                <option value={5}>5 / trang</option>
+                <option value={10}>10 / trang</option>
+                <option value={20}>20 / trang</option>
+              </select>
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -843,5 +843,8 @@
       "activeDesc": "Hệ thống Cảng vụ đã tiếp nhận tín hiệu và còi báo động khẩn cấp đang réo tại Trung tâm.",
       "standby": "Vui lòng giữ bình tĩnh, giữ liên lạc điện thoại và ở nguyên vị trí an toàn!"
     }
+  },
+  "error": {
+    "USER_DISABLED": "Tài khoản của bạn đã bị vô hiệu hóa hoặc tạm khóa. Vui lòng liên hệ quản trị viên."
   }
 }

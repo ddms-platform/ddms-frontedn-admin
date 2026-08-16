@@ -20,6 +20,7 @@ import type {
   WithdrawalResponse,
 } from '@/services/approvals-api';
 import { toast } from 'sonner';
+import Pagination from '@/components/shared/pagination';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -61,11 +62,15 @@ export default function AdminApprovals() {
   const [maintenances, setMaintenances] = useState<MaintenanceResponse[]>([]);
   const [mtFilter, setMtFilter] = useState<'all' | RequestStatus>('all');
   const [mtLoading, setMtLoading] = useState(true);
+  const [mtPage, setMtPage] = useState(1);
+  const [mtPageSize, setMtPageSize] = useState(5);
 
   // Withdrawal states
   const [withdrawals, setWithdrawals] = useState<WithdrawalResponse[]>([]);
   const [wdFilter, setWdFilter] = useState<'all' | RequestStatus>('all');
   const [wdLoading, setWdLoading] = useState(true);
+  const [wdPage, setWdPage] = useState(1);
+  const [wdPageSize, setWdPageSize] = useState(5);
 
   // Modal confirm state
   const [confirmWdModal, setConfirmWdModal] = useState<{
@@ -234,6 +239,24 @@ export default function AdminApprovals() {
       ? withdrawals
       : withdrawals.filter((w) => w.status === wdFilter);
 
+  const mtTotalPages = Math.max(
+    1,
+    Math.ceil(filteredMaintenances.length / mtPageSize),
+  );
+  const paginatedMaintenances = filteredMaintenances.slice(
+    (mtPage - 1) * mtPageSize,
+    mtPage * mtPageSize,
+  );
+
+  const wdTotalPages = Math.max(
+    1,
+    Math.ceil(filteredWithdrawals.length / wdPageSize),
+  );
+  const paginatedWithdrawals = filteredWithdrawals.slice(
+    (wdPage - 1) * wdPageSize,
+    wdPage * wdPageSize,
+  );
+
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -350,7 +373,10 @@ export default function AdminApprovals() {
             {(['all', 'pending', 'approved', 'rejected'] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => setMtFilter(f)}
+                onClick={() => {
+                  setMtFilter(f);
+                  setMtPage(1);
+                }}
                 className="rounded-xl px-4 py-2 text-xs font-semibold transition-all"
                 style={
                   mtFilter === f
@@ -382,112 +408,175 @@ export default function AdminApprovals() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {filteredMaintenances.map((m) => {
-                const st =
-                  STATUS_MAP[m.status as RequestStatus] || STATUS_MAP.pending;
-                const StatusIcon = st.icon;
-                return (
-                  <div
-                    key={m.id}
-                    className="rounded-2xl p-5 transition-all hover:scale-[1.005]"
-                    style={CARD}
-                  >
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <span className="font-semibold text-white text-base flex items-center gap-1.5">
-                            <Ship size={16} className="text-[#8892a0]" />
-                            {m.boatName}
-                          </span>
-                          <span
-                            className="flex items-center gap-1 rounded-lg px-2.5 py-0.5 text-xs font-semibold"
-                            style={{ backgroundColor: st.bg, color: st.color }}
-                          >
-                            <StatusIcon size={11} />
-                            {st.label}
-                          </span>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                {paginatedMaintenances.map((m) => {
+                  const st =
+                    STATUS_MAP[m.status as RequestStatus] || STATUS_MAP.pending;
+                  const StatusIcon = st.icon;
+                  return (
+                    <div
+                      key={m.id}
+                      className="rounded-2xl p-5 transition-all hover:scale-[1.005]"
+                      style={CARD}
+                    >
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span className="font-semibold text-white text-base flex items-center gap-1.5">
+                              <Ship size={16} className="text-[#8892a0]" />
+                              {m.boatName}
+                            </span>
+                            <span
+                              className="flex items-center gap-1 rounded-lg px-2.5 py-0.5 text-xs font-semibold"
+                              style={{
+                                backgroundColor: st.bg,
+                                color: st.color,
+                              }}
+                            >
+                              <StatusIcon size={11} />
+                              {st.label}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs pt-1">
+                            <div className="space-y-0.5">
+                              <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
+                                Dịch vụ bảo trì
+                              </p>
+                              <p className="font-semibold text-white">
+                                {m.portMaintenanceServiceName}
+                              </p>
+                            </div>
+                            <div className="space-y-0.5">
+                              <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
+                                Thời gian bắt đầu
+                              </p>
+                              <p className="text-white flex items-center gap-1">
+                                <Calendar
+                                  size={12}
+                                  className="text-[#8892a0]"
+                                />
+                                {formatDate(m.startTime)}
+                              </p>
+                            </div>
+                            <div className="space-y-0.5">
+                              <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
+                                Thời gian hoàn thành
+                              </p>
+                              <p className="text-white flex items-center gap-1">
+                                <Calendar
+                                  size={12}
+                                  className="text-[#8892a0]"
+                                />
+                                {formatDate(m.endTime)}
+                              </p>
+                            </div>
+                            <div className="space-y-0.5">
+                              <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
+                                Chi phí bảo trì
+                              </p>
+                              <p className="font-bold text-[#FF385C] text-sm">
+                                {formatCurrency(m.price)}
+                              </p>
+                            </div>
+                          </div>
+
+                          {m.reason && (
+                            <div className="pt-2">
+                              <p className="text-[#8892a0] text-xs font-semibold">
+                                Lý do bảo trì/Ghi chú thêm:
+                              </p>
+                              <p className="text-xs text-[#c8d0e0] mt-1 bg-white/5 p-2 rounded-lg italic">
+                                {m.reason}
+                              </p>
+                            </div>
+                          )}
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs pt-1">
-                          <div className="space-y-0.5">
-                            <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
-                              Dịch vụ bảo trì
-                            </p>
-                            <p className="font-semibold text-white">
-                              {m.portMaintenanceServiceName}
-                            </p>
-                          </div>
-                          <div className="space-y-0.5">
-                            <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
-                              Thời gian bắt đầu
-                            </p>
-                            <p className="text-white flex items-center gap-1">
-                              <Calendar size={12} className="text-[#8892a0]" />
-                              {formatDate(m.startTime)}
-                            </p>
-                          </div>
-                          <div className="space-y-0.5">
-                            <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
-                              Thời gian hoàn thành
-                            </p>
-                            <p className="text-white flex items-center gap-1">
-                              <Calendar size={12} className="text-[#8892a0]" />
-                              {formatDate(m.endTime)}
-                            </p>
-                          </div>
-                          <div className="space-y-0.5">
-                            <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
-                              Chi phí bảo trì
-                            </p>
-                            <p className="font-bold text-[#FF385C] text-sm">
-                              {formatCurrency(m.price)}
-                            </p>
-                          </div>
-                        </div>
-
-                        {m.reason && (
-                          <div className="pt-2">
-                            <p className="text-[#8892a0] text-xs font-semibold">
-                              Lý do bảo trì/Ghi chú thêm:
-                            </p>
-                            <p className="text-xs text-[#c8d0e0] mt-1 bg-white/5 p-2 rounded-lg italic">
-                              {m.reason}
-                            </p>
+                        {m.status === 'pending' && (
+                          <div className="flex gap-2 md:flex-col shrink-0 w-full md:w-auto">
+                            <button
+                              onClick={() => handleApproveMt(m.id)}
+                              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all hover:opacity-85"
+                              style={{
+                                backgroundColor: 'rgba(16,185,129,0.12)',
+                                color: '#10B981',
+                                border: '1px solid rgba(16,185,129,0.2)',
+                              }}
+                            >
+                              <CheckCircle size={13} /> Duyệt
+                            </button>
+                            <button
+                              onClick={() => handleRejectMt(m.id)}
+                              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all hover:opacity-85"
+                              style={{
+                                backgroundColor: 'rgba(239,68,68,0.12)',
+                                color: '#EF4444',
+                                border: '1px solid rgba(239,68,68,0.2)',
+                              }}
+                            >
+                              <XCircle size={13} /> Từ chối
+                            </button>
                           </div>
                         )}
                       </div>
-
-                      {m.status === 'pending' && (
-                        <div className="flex gap-2 md:flex-col shrink-0 w-full md:w-auto">
-                          <button
-                            onClick={() => handleApproveMt(m.id)}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all hover:opacity-85"
-                            style={{
-                              backgroundColor: 'rgba(16,185,129,0.12)',
-                              color: '#10B981',
-                              border: '1px solid rgba(16,185,129,0.2)',
-                            }}
-                          >
-                            <CheckCircle size={13} /> Duyệt
-                          </button>
-                          <button
-                            onClick={() => handleRejectMt(m.id)}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all hover:opacity-85"
-                            style={{
-                              backgroundColor: 'rgba(239,68,68,0.12)',
-                              color: '#EF4444',
-                              border: '1px solid rgba(239,68,68,0.2)',
-                            }}
-                          >
-                            <XCircle size={13} /> Từ chối
-                          </button>
-                        </div>
-                      )}
                     </div>
+                  );
+                })}
+              </div>
+
+              {/* Maintenance Pagination */}
+              {filteredMaintenances.length > 0 && (
+                <div
+                  className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl"
+                  style={CARD}
+                >
+                  <div
+                    className="flex items-center gap-3 text-xs"
+                    style={{ color: '#8892a0' }}
+                  >
+                    <span>
+                      Hiển thị{' '}
+                      <strong style={{ color: '#fff' }}>
+                        {(mtPage - 1) * mtPageSize + 1} -{' '}
+                        {Math.min(
+                          mtPage * mtPageSize,
+                          filteredMaintenances.length,
+                        )}
+                      </strong>{' '}
+                      trên tổng số{' '}
+                      <strong style={{ color: '#fff' }}>
+                        {filteredMaintenances.length}
+                      </strong>{' '}
+                      yêu cầu
+                    </span>
+                    <select
+                      value={mtPageSize}
+                      onChange={(e) => {
+                        setMtPageSize(Number(e.target.value));
+                        setMtPage(1);
+                      }}
+                      className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                      style={{
+                        backgroundColor: '#141e35',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: '#fff',
+                      }}
+                    >
+                      <option value={5}>5 / trang</option>
+                      <option value={10}>10 / trang</option>
+                      <option value={20}>20 / trang</option>
+                    </select>
                   </div>
-                );
-              })}
+
+                  <Pagination
+                    currentPage={mtPage}
+                    totalPages={mtTotalPages}
+                    onPageChange={setMtPage}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -545,7 +634,10 @@ export default function AdminApprovals() {
             {(['all', 'pending', 'approved', 'rejected'] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => setWdFilter(f)}
+                onClick={() => {
+                  setWdFilter(f);
+                  setWdPage(1);
+                }}
                 className="rounded-xl px-4 py-2 text-xs font-semibold transition-all"
                 style={
                   wdFilter === f
@@ -577,117 +669,180 @@ export default function AdminApprovals() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {filteredWithdrawals.map((w) => {
-                const st =
-                  STATUS_MAP[w.status as RequestStatus] || STATUS_MAP.pending;
-                const StatusIcon = st.icon;
-                return (
-                  <div
-                    key={w.id}
-                    className="rounded-2xl p-5 transition-all hover:scale-[1.005]"
-                    style={CARD}
-                  >
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <span className="font-semibold text-white text-base flex items-center gap-1.5">
-                            <User size={16} className="text-[#8892a0]" />
-                            {w.userFullName}
-                          </span>
-                          <span className="text-xs text-[#8892a0] flex items-center gap-1">
-                            <Mail size={12} />
-                            {w.userEmail}
-                          </span>
-                          <span
-                            className="flex items-center gap-1 rounded-lg px-2.5 py-0.5 text-xs font-semibold"
-                            style={{ backgroundColor: st.bg, color: st.color }}
-                          >
-                            <StatusIcon size={11} />
-                            {st.label}
-                          </span>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                {paginatedWithdrawals.map((w) => {
+                  const st =
+                    STATUS_MAP[w.status as RequestStatus] || STATUS_MAP.pending;
+                  const StatusIcon = st.icon;
+                  return (
+                    <div
+                      key={w.id}
+                      className="rounded-2xl p-5 transition-all hover:scale-[1.005]"
+                      style={CARD}
+                    >
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span className="font-semibold text-white text-base flex items-center gap-1.5">
+                              <User size={16} className="text-[#8892a0]" />
+                              {w.userFullName}
+                            </span>
+                            <span className="text-xs text-[#8892a0] flex items-center gap-1">
+                              <Mail size={12} />
+                              {w.userEmail}
+                            </span>
+                            <span
+                              className="flex items-center gap-1 rounded-lg px-2.5 py-0.5 text-xs font-semibold"
+                              style={{
+                                backgroundColor: st.bg,
+                                color: st.color,
+                              }}
+                            >
+                              <StatusIcon size={11} />
+                              {st.label}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs pt-1">
+                            <div className="space-y-0.5">
+                              <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
+                                Số tiền rút
+                              </p>
+                              <p className="font-bold text-[#10B981] text-base">
+                                {formatCurrency(w.amount)}
+                              </p>
+                            </div>
+                            <div className="space-y-0.5">
+                              <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
+                                Ngân hàng
+                              </p>
+                              <p className="font-semibold text-white flex items-center gap-1">
+                                <Building
+                                  size={12}
+                                  className="text-[#8892a0]"
+                                />
+                                {w.bankName}
+                              </p>
+                            </div>
+                            <div className="space-y-0.5">
+                              <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
+                                Số tài khoản & Tên
+                              </p>
+                              <p className="text-white">
+                                <span className="font-mono font-bold">
+                                  {w.accountNumber}
+                                </span>
+                                <br />
+                                <span className="text-[#8892a0]">
+                                  {w.accountName}
+                                </span>
+                              </p>
+                            </div>
+                            <div className="space-y-0.5">
+                              <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
+                                Thời gian yêu cầu
+                              </p>
+                              <p className="text-white flex items-center gap-1">
+                                <Calendar
+                                  size={12}
+                                  className="text-[#8892a0]"
+                                />
+                                {formatDate(w.createdAt)}
+                              </p>
+                            </div>
+                          </div>
+
+                          {w.processedAt && (
+                            <div className="text-[10px] text-[#8892a0] pt-1">
+                              Xử lý vào lúc: {formatDate(w.processedAt)}
+                            </div>
+                          )}
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs pt-1">
-                          <div className="space-y-0.5">
-                            <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
-                              Số tiền rút
-                            </p>
-                            <p className="font-bold text-[#10B981] text-base">
-                              {formatCurrency(w.amount)}
-                            </p>
-                          </div>
-                          <div className="space-y-0.5">
-                            <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
-                              Ngân hàng
-                            </p>
-                            <p className="font-semibold text-white flex items-center gap-1">
-                              <Building size={12} className="text-[#8892a0]" />
-                              {w.bankName}
-                            </p>
-                          </div>
-                          <div className="space-y-0.5">
-                            <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
-                              Số tài khoản & Tên
-                            </p>
-                            <p className="text-white">
-                              <span className="font-mono font-bold">
-                                {w.accountNumber}
-                              </span>
-                              <br />
-                              <span className="text-[#8892a0]">
-                                {w.accountName}
-                              </span>
-                            </p>
-                          </div>
-                          <div className="space-y-0.5">
-                            <p className="text-[#8892a0] uppercase tracking-wider text-[10px]">
-                              Thời gian yêu cầu
-                            </p>
-                            <p className="text-white flex items-center gap-1">
-                              <Calendar size={12} className="text-[#8892a0]" />
-                              {formatDate(w.createdAt)}
-                            </p>
-                          </div>
-                        </div>
-
-                        {w.processedAt && (
-                          <div className="text-[10px] text-[#8892a0] pt-1">
-                            Xử lý vào lúc: {formatDate(w.processedAt)}
+                        {w.status === 'pending' && (
+                          <div className="flex gap-2 md:flex-col shrink-0 w-full md:w-auto">
+                            <button
+                              onClick={() => handleOpenApproveWd(w)}
+                              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all hover:opacity-85"
+                              style={{
+                                backgroundColor: 'rgba(16,185,129,0.12)',
+                                color: '#10B981',
+                                border: '1px solid rgba(16,185,129,0.2)',
+                              }}
+                            >
+                              <ArrowUpRight size={13} /> Duyệt giao dịch
+                            </button>
+                            <button
+                              onClick={() => handleRejectWd(w.id)}
+                              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all hover:opacity-85"
+                              style={{
+                                backgroundColor: 'rgba(239,68,68,0.12)',
+                                color: '#EF4444',
+                                border: '1px solid rgba(239,68,68,0.2)',
+                              }}
+                            >
+                              <XCircle size={13} /> Từ chối
+                            </button>
                           </div>
                         )}
                       </div>
-
-                      {w.status === 'pending' && (
-                        <div className="flex gap-2 md:flex-col shrink-0 w-full md:w-auto">
-                          <button
-                            onClick={() => handleOpenApproveWd(w)}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all hover:opacity-85"
-                            style={{
-                              backgroundColor: 'rgba(16,185,129,0.12)',
-                              color: '#10B981',
-                              border: '1px solid rgba(16,185,129,0.2)',
-                            }}
-                          >
-                            <ArrowUpRight size={13} /> Duyệt giao dịch
-                          </button>
-                          <button
-                            onClick={() => handleRejectWd(w.id)}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all hover:opacity-85"
-                            style={{
-                              backgroundColor: 'rgba(239,68,68,0.12)',
-                              color: '#EF4444',
-                              border: '1px solid rgba(239,68,68,0.2)',
-                            }}
-                          >
-                            <XCircle size={13} /> Từ chối
-                          </button>
-                        </div>
-                      )}
                     </div>
+                  );
+                })}
+              </div>
+
+              {/* Withdrawal Pagination */}
+              {filteredWithdrawals.length > 0 && (
+                <div
+                  className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl"
+                  style={CARD}
+                >
+                  <div
+                    className="flex items-center gap-3 text-xs"
+                    style={{ color: '#8892a0' }}
+                  >
+                    <span>
+                      Hiển thị{' '}
+                      <strong style={{ color: '#fff' }}>
+                        {(wdPage - 1) * wdPageSize + 1} -{' '}
+                        {Math.min(
+                          wdPage * wdPageSize,
+                          filteredWithdrawals.length,
+                        )}
+                      </strong>{' '}
+                      trên tổng số{' '}
+                      <strong style={{ color: '#fff' }}>
+                        {filteredWithdrawals.length}
+                      </strong>{' '}
+                      yêu cầu
+                    </span>
+                    <select
+                      value={wdPageSize}
+                      onChange={(e) => {
+                        setWdPageSize(Number(e.target.value));
+                        setWdPage(1);
+                      }}
+                      className="rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer"
+                      style={{
+                        backgroundColor: '#141e35',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: '#fff',
+                      }}
+                    >
+                      <option value={5}>5 / trang</option>
+                      <option value={10}>10 / trang</option>
+                      <option value={20}>20 / trang</option>
+                    </select>
                   </div>
-                );
-              })}
+
+                  <Pagination
+                    currentPage={wdPage}
+                    totalPages={wdTotalPages}
+                    onPageChange={setWdPage}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

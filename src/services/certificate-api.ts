@@ -37,6 +37,7 @@ export interface OwnerDocumentListItem {
   documentUrl: string;
   expiryDate?: string | null;
   adminNote?: string | null;
+  isReuploaded?: boolean;
   createdAt: string;
   updatedAt: string;
 }
