@@ -95,6 +95,17 @@ export const dockApi = {
     Api.del<ApiResponse<{ deleted: boolean }>>(
       `/admin/docks/${dockId}/schedules/${scheduleId}`,
     ),
+
+  /** Danh sach khoang ben mo, theo dung thu tu so do. */
+  getBerths: (dockId: string) =>
+    Api.get<ApiResponse<string[]>>(`/admin/docks/${dockId}/berths`),
+
+  /** Gan khoang neo cho mot lich neo. Truyen chuoi rong de go khoang. */
+  assignBerth: (dockScheduleId: string, berthCode: string | null) =>
+    Api.put<ApiResponse<{ id: string; berthCode: string | null }>>(
+      `/admin/docks/schedules/${dockScheduleId}/berth`,
+      { berthCode },
+    ),
 };
 
 export interface DockScheduleResponse {
@@ -103,6 +114,8 @@ export interface DockScheduleResponse {
   boatId: string;
   boatName: string;
   scheduleId?: string;
+  /** Khoang neo cang vu da gan, vi du "A12". Rong khi chua gan. */
+  berthCode?: string | null;
   startTime: string;
   endTime: string;
   createdAt: string;
