@@ -88,15 +88,19 @@ function App() {
                 />
               </Route>
 
-              {/* Kiosk Check-in — fullscreen, không sidebar */}
-              <Route
-                path={routeName.kioskCheckin}
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <KioskCheckinPage />
-                  </Suspense>
-                }
-              />
+              {/* Kiosk Check-in — fullscreen, không sidebar. API check-in chỉ nhận
+                  admin, nên chặn luôn ở route để khách vãng lai bị đưa về trang đăng nhập
+                  thay vì vào được rồi ăn lỗi 401 khi quét. */}
+              <Route element={<ProtectedRoute roles={['admin']} />}>
+                <Route
+                  path={routeName.kioskCheckin}
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <KioskCheckinPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
 
               {/* Admin pages — role-gated */}
               <Route element={<ProtectedRoute roles={['admin']} />}>
