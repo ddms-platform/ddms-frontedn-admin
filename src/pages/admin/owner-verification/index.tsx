@@ -82,6 +82,7 @@ interface VesselData {
   documentUrls: string[];
   imageUrls: string[];
   certificates?: CertificateListItem[];
+  maxPassengers?: number;
   status: string;
 }
 
@@ -1225,6 +1226,20 @@ export default function AdminOwnerVerification() {
                                     </p>
                                     <p className="font-semibold text-white mt-0.5 font-mono">
                                       {vessel.registrationNumber}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p
+                                      className="text-[10px] uppercase tracking-wider"
+                                      style={{ color: '#8892a0' }}
+                                    >
+                                      Sức chứa
+                                    </p>
+                                    <p className="font-semibold text-white mt-0.5">
+                                      {vessel.maxPassengers &&
+                                      vessel.maxPassengers > 0
+                                        ? `${vessel.maxPassengers} khách`
+                                        : 'N/A'}
                                     </p>
                                   </div>
                                   <div>
