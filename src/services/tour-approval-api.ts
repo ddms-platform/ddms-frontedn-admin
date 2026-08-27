@@ -22,6 +22,8 @@ export interface TourApprovalItem {
   cancelPolicy?: string | null;
   cancel_hours?: number | null;
   cancelHours?: number | null;
+  rejection_reason?: string | null;
+  rejectionReason?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -35,11 +37,13 @@ export interface UpdateTourApprovalRequest {
   status: string;
   cancel_policy?: string | null;
   cancel_hours?: number | null;
+  rejection_reason?: string | null;
 }
 
 const toUpdateRequest = (
   tour: TourApprovalItem,
   status: string,
+  rejectionReason?: string | null,
 ): UpdateTourApprovalRequest => ({
   name: tour.name ?? '',
   price: tour.price ?? 0,
@@ -49,6 +53,8 @@ const toUpdateRequest = (
   status,
   cancel_policy: tour.cancel_policy ?? tour.cancelPolicy ?? 'free',
   cancel_hours: tour.cancel_hours ?? tour.cancelHours ?? null,
+  rejection_reason:
+    status === 'rejected' ? rejectionReason?.trim() || null : null,
 });
 
 export const tourApprovalApi = {
@@ -60,9 +66,9 @@ export const tourApprovalApi = {
       toUpdateRequest(tour, 'active'),
     ),
 
-  rejectTour: (tour: TourApprovalItem) =>
+  rejectTour: (tour: TourApprovalItem, reason: string) =>
     Api.put<ApiResponse<TourApprovalItem>>(
       `/legacy/tours/${tour.id}`,
-      toUpdateRequest(tour, 'rejected'),
+      toUpdateRequest(tour, 'rejected', reason),
     ),
 };
