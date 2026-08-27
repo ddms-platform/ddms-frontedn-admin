@@ -217,15 +217,22 @@ export default function AdminTourApprovals() {
   };
 
   const handleReject = async (tour: TourApprovalItem) => {
-    if (!confirm(`Từ chối tour "${tour.name || 'không tên'}"?`)) {
+    const reason = window.prompt(
+      `Nhập lý do từ chối tour "${tour.name || 'không tên'}" (bắt buộc — chủ thuyền sẽ thấy lý do này):`,
+    );
+    if (reason === null) return;
+
+    const trimmed = reason.trim();
+    if (!trimmed) {
+      toast.error('Phải nhập lý do từ chối.');
       return;
     }
 
     setProcessingId(tour.id);
     try {
-      const res = await tourApprovalApi.rejectTour(tour);
+      const res = await tourApprovalApi.rejectTour(tour, trimmed);
       if (res.status === 200 && res.data?.code === 1000) {
-        toast.success('Đã từ chối tour.');
+        toast.success('Đã từ chối tour và gửi lý do cho chủ thuyền.');
         fetchTours();
       } else {
         toast.error('Không từ chối được tour.');
@@ -447,6 +454,16 @@ export default function AdminTourApprovals() {
                         >
                           {tour.description || 'Chưa có mô tả'}
                         </p>
+                        {status === 'rejected' &&
+                          (tour.rejection_reason || tour.rejectionReason) && (
+                            <p
+                              className="mt-2 line-clamp-2 text-xs"
+                              style={{ color: '#FCA5A5' }}
+                            >
+                              Lý do:{' '}
+                              {tour.rejection_reason || tour.rejectionReason}
+                            </p>
+                          )}
                       </div>
                     </td>
                     <td
