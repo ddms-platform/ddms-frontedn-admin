@@ -702,37 +702,37 @@ export default function AdminOwnerVerification() {
                   >
                     <Eye size={13} /> Xem hồ sơ
                   </button>
+                  {!o.isDocumentApproved &&
+                    o.documents &&
+                    o.documents.length > 0 && (
+                      <>
+                        <button
+                          onClick={() => handleApproveDocuments(o.id)}
+                          className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all hover:opacity-80 cursor-pointer"
+                          style={{
+                            backgroundColor: 'rgba(16,185,129,0.15)',
+                            color: '#10B981',
+                            border: '1px solid rgba(16,185,129,0.3)',
+                          }}
+                          title="Duyệt & chấp thuận giấy tờ pháp lý để mở khóa hoàn toàn"
+                        >
+                          <ShieldCheck size={13} /> Duyệt hồ sơ pháp lý
+                        </button>
+                        <button
+                          onClick={() => handleRejectDocuments(o)}
+                          className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all hover:opacity-80 cursor-pointer"
+                          style={{
+                            backgroundColor: 'rgba(239,68,68,0.12)',
+                            color: '#EF4444',
+                          }}
+                          title="Từ chối giấy tờ và yêu cầu nộp lại"
+                        >
+                          <ShieldX size={13} /> Từ chối giấy tờ
+                        </button>
+                      </>
+                    )}
                   {o.status === 'verified' && (
                     <>
-                      {!o.isDocumentApproved &&
-                        o.documents &&
-                        o.documents.length > 0 && (
-                          <>
-                            <button
-                              onClick={() => handleApproveDocuments(o.id)}
-                              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all hover:opacity-80 cursor-pointer"
-                              style={{
-                                backgroundColor: 'rgba(16,185,129,0.15)',
-                                color: '#10B981',
-                                border: '1px solid rgba(16,185,129,0.3)',
-                              }}
-                              title="Duyệt & chấp thuận giấy tờ pháp lý để mở khóa hoàn toàn"
-                            >
-                              <ShieldCheck size={13} /> Duyệt hồ sơ pháp lý
-                            </button>
-                            <button
-                              onClick={() => handleRejectDocuments(o)}
-                              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all hover:opacity-80 cursor-pointer"
-                              style={{
-                                backgroundColor: 'rgba(239,68,68,0.12)',
-                                color: '#EF4444',
-                              }}
-                              title="Từ chối giấy tờ và yêu cầu nộp lại"
-                            >
-                              <ShieldX size={13} /> Từ chối giấy tờ
-                            </button>
-                          </>
-                        )}
                       <button
                         onClick={() => {
                           setExtendModalOwner(o);
