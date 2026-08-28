@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import {
   Clock,
   AlertTriangle,
@@ -8,17 +14,23 @@ import {
   FileWarning,
   Unlock,
   Ship,
+  User,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   certificateApi,
   COMPLIANCE_STATUS_META,
   buildTypeLabelMap,
+  isOwnerDocsAwaitingReview,
+  normalizeOwnerVerification,
+  ownerVerificationApi,
   type CertificateListItem,
+  type OwnerVerificationItem,
 } from '@/services/certificate-api';
 import { boatApi, type BoatListItemResponse } from '@/services/boat-api';
 import CertificateReviewTable from '@/pages/admin/components/CertificateReviewTable';
 import CertificateTypesManager from '@/pages/admin/components/CertificateTypesManager';
+import OwnerDocumentsReviewPanel from '@/pages/admin/components/OwnerDocumentsReviewPanel';
 
 const ACCENT = '#FF385C';
 const CARD = {
@@ -28,12 +40,65 @@ const CARD = {
 
 type Tab = 'pending' | 'approved' | 'expiring' | 'blocked' | 'types';
 
+function SectionHeader({
+  icon: Icon,
+  title,
+  subtitle,
+  count,
+  accent,
+}: {
+  icon: typeof User;
+  title: string;
+  subtitle: string;
+  count: number;
+  accent: string;
+}) {
+  return (
+    <div className="mb-4 flex items-start justify-between gap-3">
+      <div className="flex items-start gap-3 min-w-0">
+        <div
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+          style={{ backgroundColor: `${accent}22` }}
+        >
+          <Icon size={18} style={{ color: accent }} />
+        </div>
+        <div className="min-w-0">
+          <h2 className="text-sm font-bold" style={{ color: '#fff' }}>
+            {title}
+          </h2>
+          <p className="mt-0.5 text-xs" style={{ color: '#8892a0' }}>
+            {subtitle}
+          </p>
+        </div>
+      </div>
+      <span
+        className="inline-flex min-w-6 shrink-0 items-center justify-center rounded-lg px-2 py-0.5 text-[11px] font-bold"
+        style={{
+          backgroundColor: 'rgba(255,255,255,0.06)',
+          color: '#c8d0e0',
+        }}
+      >
+        {count}
+      </span>
+    </div>
+  );
+}
+
+function CardShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="rounded-2xl p-5" style={CARD}>
+      {children}
+    </div>
+  );
+}
+
 export default function AdminLegalCompliance() {
   const [tab, setTab] = useState<Tab>('pending');
   const [pending, setPending] = useState<CertificateListItem[]>([]);
   const [approved, setApproved] = useState<CertificateListItem[]>([]);
   const [expiring, setExpiring] = useState<CertificateListItem[]>([]);
   const [blockedBoats, setBlockedBoats] = useState<BoatListItemResponse[]>([]);
+  const [owners, setOwners] = useState<OwnerVerificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [unlockingId, setUnlockingId] = useState<string | null>(null);
   const [typeLabels, setTypeLabels] = useState<Record<string, string>>({});
@@ -46,31 +111,46 @@ export default function AdminLegalCompliance() {
       certificateApi.getExpiring(),
       boatApi.getAll(),
       certificateApi.getTypes(),
+      ownerVerificationApi.list().catch(() => null),
     ])
-      .then(([pendingRes, approvedRes, expiringRes, boatsRes, typesRes]) => {
-        if (pendingRes.status === 200 && pendingRes.data?.code === 1000) {
-          setPending(pendingRes.data.result || []);
-        }
-        if (approvedRes.status === 200 && approvedRes.data?.code === 1000) {
-          setApproved(approvedRes.data.result || []);
-        }
-        if (expiringRes.status === 200 && expiringRes.data?.code === 1000) {
-          setExpiring(expiringRes.data.result || []);
-        }
-        if (boatsRes.status === 200 && boatsRes.data?.code === 1000) {
-          const boats = boatsRes.data.result || [];
-          setBlockedBoats(
-            boats.filter(
-              (b) =>
-                b.complianceStatus === 'hidden' ||
-                b.complianceStatus === 'locked',
-            ),
-          );
-        }
-        if (typesRes.status === 200 && typesRes.data?.code === 1000) {
-          setTypeLabels(buildTypeLabelMap(typesRes.data.result || []));
-        }
-      })
+      .then(
+        ([
+          pendingRes,
+          approvedRes,
+          expiringRes,
+          boatsRes,
+          typesRes,
+          ownersRes,
+        ]) => {
+          if (pendingRes.status === 200 && pendingRes.data?.code === 1000) {
+            setPending(pendingRes.data.result || []);
+          }
+          if (approvedRes.status === 200 && approvedRes.data?.code === 1000) {
+            setApproved(approvedRes.data.result || []);
+          }
+          if (expiringRes.status === 200 && expiringRes.data?.code === 1000) {
+            setExpiring(expiringRes.data.result || []);
+          }
+          if (boatsRes.status === 200 && boatsRes.data?.code === 1000) {
+            const boats = boatsRes.data.result || [];
+            setBlockedBoats(
+              boats.filter(
+                (b) =>
+                  b.complianceStatus === 'hidden' ||
+                  b.complianceStatus === 'locked',
+              ),
+            );
+          }
+          if (typesRes.status === 200 && typesRes.data?.code === 1000) {
+            setTypeLabels(buildTypeLabelMap(typesRes.data.result || []));
+          }
+          if (ownersRes?.status === 200 && ownersRes.data?.code === 1000) {
+            setOwners(
+              (ownersRes.data.result || []).map(normalizeOwnerVerification),
+            );
+          }
+        },
+      )
       .catch((err) => {
         console.error(err);
         toast.error('Không thể tải dữ liệu kiểm duyệt pháp lý');
@@ -81,6 +161,15 @@ export default function AdminLegalCompliance() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const pendingOwners = useMemo(
+    () => owners.filter(isOwnerDocsAwaitingReview),
+    [owners],
+  );
+  const approvedOwners = useMemo(
+    () => owners.filter((o) => o.isDocumentApproved),
+    [owners],
+  );
 
   const handleUnlock = async (boatId: string) => {
     if (
@@ -113,14 +202,14 @@ export default function AdminLegalCompliance() {
     () => [
       {
         label: 'Chờ duyệt',
-        value: pending.length,
+        value: pending.length + pendingOwners.length,
         color: '#F59E0B',
         bg: 'rgba(245,158,11,0.12)',
         icon: Clock,
       },
       {
         label: 'Đã duyệt',
-        value: approved.length,
+        value: approved.length + approvedOwners.length,
         color: '#10B981',
         bg: 'rgba(16,185,129,0.12)',
         icon: CheckCircle,
@@ -140,12 +229,27 @@ export default function AdminLegalCompliance() {
         icon: FileWarning,
       },
     ],
-    [pending.length, approved.length, expiring.length, blockedBoats.length],
+    [
+      pending.length,
+      pendingOwners.length,
+      approved.length,
+      approvedOwners.length,
+      expiring.length,
+      blockedBoats.length,
+    ],
   );
 
   const tabs: { id: Tab; label: string; count?: number }[] = [
-    { id: 'pending', label: 'Chờ duyệt', count: pending.length },
-    { id: 'approved', label: 'Đã duyệt', count: approved.length },
+    {
+      id: 'pending',
+      label: 'Chờ duyệt',
+      count: pending.length + pendingOwners.length,
+    },
+    {
+      id: 'approved',
+      label: 'Đã duyệt',
+      count: approved.length + approvedOwners.length,
+    },
     { id: 'expiring', label: 'Sắp hết hạn', count: expiring.length },
     { id: 'blocked', label: 'Tàu bị chặn', count: blockedBoats.length },
     { id: 'types', label: 'Loại giấy tờ' },
@@ -162,7 +266,8 @@ export default function AdminLegalCompliance() {
             Kiểm duyệt pháp lý
           </h1>
           <p className="mt-1 text-sm" style={{ color: '#8892a0' }}>
-            Duyệt giấy tờ tàu, theo dõi hạn và mở khóa tàu bị chặn
+            Duyệt giấy tờ chủ thuyền và giấy tờ tàu, theo dõi hạn và mở khóa tàu
+            bị chặn
           </p>
         </div>
         <button
@@ -241,32 +346,88 @@ export default function AdminLegalCompliance() {
         ))}
       </div>
 
-      <div className="rounded-2xl p-5" style={CARD}>
-        {tab === 'pending' && (
-          <CertificateReviewTable
-            certificates={pending}
-            loading={loading}
-            showBoatInfo
-            showOwnerInfo
-            typeLabels={typeLabels}
-            emptyMessage="Không có giấy tờ chờ duyệt"
-            onChanged={fetchData}
-          />
-        )}
+      {tab === 'pending' && (
+        <div className="space-y-6">
+          <CardShell>
+            <SectionHeader
+              icon={User}
+              title="Giấy tờ chủ thuyền"
+              subtitle="Duyệt cả hồ sơ pháp lý của chủ thuyền (CCCD, giấy phép kinh doanh, …). Sau khi duyệt, tính năng thương mại sẽ được mở khóa."
+              count={pendingOwners.length}
+              accent="#60A5FA"
+            />
+            <OwnerDocumentsReviewPanel
+              owners={pendingOwners}
+              loading={loading}
+              typeLabels={typeLabels}
+              showActions
+              emptyMessage="Không có hồ sơ chủ thuyền chờ duyệt"
+              onChanged={fetchData}
+            />
+          </CardShell>
+          <CardShell>
+            <SectionHeader
+              icon={Ship}
+              title="Giấy tờ thuyền"
+              subtitle="Duyệt từng giấy tờ tàu: đăng kiểm, bảo hiểm trách nhiệm dân sự, …"
+              count={pending.length}
+              accent="#FF385C"
+            />
+            <CertificateReviewTable
+              certificates={pending}
+              loading={loading}
+              showBoatInfo
+              showOwnerInfo
+              typeLabels={typeLabels}
+              emptyMessage="Không có giấy tờ thuyền chờ duyệt"
+              onChanged={fetchData}
+            />
+          </CardShell>
+        </div>
+      )}
 
-        {tab === 'approved' && (
-          <CertificateReviewTable
-            certificates={approved}
-            loading={loading}
-            showBoatInfo
-            showOwnerInfo
-            typeLabels={typeLabels}
-            emptyMessage="Chưa có giấy tờ nào được duyệt"
-            onChanged={fetchData}
-          />
-        )}
+      {tab === 'approved' && (
+        <div className="space-y-6">
+          <CardShell>
+            <SectionHeader
+              icon={User}
+              title="Giấy tờ chủ thuyền"
+              subtitle="Hồ sơ pháp lý chủ thuyền đã được Ban quản trị phê duyệt."
+              count={approvedOwners.length}
+              accent="#60A5FA"
+            />
+            <OwnerDocumentsReviewPanel
+              owners={approvedOwners}
+              loading={loading}
+              typeLabels={typeLabels}
+              showActions={false}
+              emptyMessage="Chưa có hồ sơ chủ thuyền nào được duyệt"
+              onChanged={fetchData}
+            />
+          </CardShell>
+          <CardShell>
+            <SectionHeader
+              icon={Ship}
+              title="Giấy tờ thuyền"
+              subtitle="Giấy tờ tàu đã duyệt và còn hiệu lực trong danh sách này."
+              count={approved.length}
+              accent="#FF385C"
+            />
+            <CertificateReviewTable
+              certificates={approved}
+              loading={loading}
+              showBoatInfo
+              showOwnerInfo
+              typeLabels={typeLabels}
+              emptyMessage="Chưa có giấy tờ thuyền nào được duyệt"
+              onChanged={fetchData}
+            />
+          </CardShell>
+        </div>
+      )}
 
-        {tab === 'expiring' && (
+      {tab === 'expiring' && (
+        <CardShell>
           <CertificateReviewTable
             certificates={expiring}
             loading={loading}
@@ -276,12 +437,18 @@ export default function AdminLegalCompliance() {
             emptyMessage="Không có giấy tờ hết hạn trong cửa sổ cảnh báo hiện tại"
             onChanged={fetchData}
           />
-        )}
+        </CardShell>
+      )}
 
-        {tab === 'types' && <CertificateTypesManager />}
+      {tab === 'types' && (
+        <CardShell>
+          <CertificateTypesManager />
+        </CardShell>
+      )}
 
-        {tab === 'blocked' &&
-          (loading ? (
+      {tab === 'blocked' && (
+        <CardShell>
+          {loading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2
                 size={24}
@@ -359,8 +526,9 @@ export default function AdminLegalCompliance() {
                 );
               })}
             </div>
-          ))}
-      </div>
+          )}
+        </CardShell>
+      )}
     </div>
   );
 }

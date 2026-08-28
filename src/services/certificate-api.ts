@@ -42,6 +42,43 @@ export interface OwnerDocumentListItem {
   updatedAt: string;
 }
 
+/** Admin owner-verification list item (legal docs live on the profile, not per-certificate). */
+export interface OwnerVerificationItem {
+  id: string;
+  name: string;
+  owner: string;
+  email: string;
+  phone: string;
+  address?: string;
+  license?: string;
+  entityType?: string;
+  submitted?: string;
+  status: string;
+  boats?: number;
+  isDocumentDeadlineExpired?: boolean;
+  isDocumentCompleted?: boolean;
+  isDocumentPendingReview?: boolean;
+  isDocumentApproved?: boolean;
+  isDocumentRejected?: boolean;
+  isDocumentResubmitted?: boolean;
+  documents?: OwnerDocumentListItem[];
+}
+
+export function normalizeOwnerVerification(
+  raw: OwnerVerificationItem,
+): OwnerVerificationItem {
+  return {
+    ...raw,
+    status: raw.status === 'approved' ? 'verified' : raw.status,
+    entityType: raw.entityType || 'individual',
+    documents: raw.documents || [],
+  };
+}
+
+export function isOwnerDocsAwaitingReview(o: OwnerVerificationItem): boolean {
+  return Boolean(o.isDocumentPendingReview || o.isDocumentResubmitted);
+}
+
 export interface CertificateTypeItem {
   id: number;
   code: string;
@@ -197,5 +234,17 @@ export const certificateApi = {
   deleteType: (id: number) =>
     Api.del<ApiResponse<{ success: boolean }>>(
       `/admin/certificate-types/${id}`,
+    ),
+};
+
+export const ownerVerificationApi = {
+  list: () =>
+    Api.get<ApiResponse<OwnerVerificationItem[]>>(
+      '/admin/owners/verifications',
+    ),
+
+  approveDocuments: (id: string) =>
+    Api.post<ApiResponse<{ message?: string }>>(
+      `/admin/owners/verifications/${id}/approve-documents`,
     ),
 };
