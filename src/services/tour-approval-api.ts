@@ -79,3 +79,46 @@ export const tourApprovalApi = {
       toUpdateRequest(tour, 'rejected', reason),
     ),
 };
+
+export interface ServiceChangeProposed {
+  name?: string;
+  basePrice?: number;
+  serviceType?: string;
+  description?: string;
+  rooms?: { name: string; price?: number }[];
+  combos?: { name: string; price?: number }[];
+}
+
+export interface ServiceChangeItem {
+  id: string;
+  tourId: string;
+  tourName: string;
+  tourStatus?: string | null;
+  currentPrice: number;
+  boatId: string;
+  boatName?: string | null;
+  ownerId: string;
+  status: string;
+  rejectionReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  proposed?: ServiceChangeProposed | null;
+}
+
+export const serviceChangeApi = {
+  list: (status?: string) =>
+    Api.get<ApiResponse<ServiceChangeItem[]>>('/admin/service-changes', {
+      params: status ? { status } : undefined,
+    }),
+
+  approve: (id: string) =>
+    Api.post<ApiResponse<ServiceChangeItem>>(
+      `/admin/service-changes/${id}/approve`,
+    ),
+
+  reject: (id: string, reason: string) =>
+    Api.post<ApiResponse<ServiceChangeItem>>(
+      `/admin/service-changes/${id}/reject`,
+      { reason },
+    ),
+};
