@@ -7,6 +7,7 @@ import {
   Search,
   Ship,
   Timer,
+  Users,
   XCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -66,6 +67,10 @@ function normalizeStatus(status?: string | null) {
 
 function getDuration(tour: TourApprovalItem) {
   return tour.duration_minutes ?? tour.durationMinutes ?? 0;
+}
+
+function getMaxGuests(tour: TourApprovalItem) {
+  return tour.max_guests ?? tour.maxGuests ?? null;
 }
 
 function getRating(tour: TourApprovalItem) {
@@ -416,6 +421,7 @@ export default function AdminTourApprovals() {
                   'Tour',
                   'Giá',
                   'Thời lượng',
+                  'Số khách tối đa',
                   'Địa điểm',
                   'Đánh giá',
                   'Trạng thái',
@@ -476,6 +482,14 @@ export default function AdminTourApprovals() {
                       <div className="flex items-center gap-2">
                         <Timer size={15} style={{ color: '#8892a0' }} />
                         {getDuration(tour)} phút
+                      </div>
+                    </td>
+                    <td className="px-6 py-4" style={{ color: '#c8d0e0' }}>
+                      <div className="flex items-center gap-2">
+                        <Users size={15} style={{ color: '#8892a0' }} />
+                        {getMaxGuests(tour)
+                          ? `${getMaxGuests(tour)} khách`
+                          : 'Theo thuyền'}
                       </div>
                     </td>
                     <td className="px-6 py-4" style={{ color: '#c8d0e0' }}>

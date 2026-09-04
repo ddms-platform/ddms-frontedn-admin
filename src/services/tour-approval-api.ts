@@ -12,6 +12,9 @@ export interface TourApprovalItem {
   description?: string | null;
   duration_minutes?: number | null;
   durationMinutes?: number | null;
+  /** Số khách tối đa chủ thuyền khai cho tour. Null = chưa khai. */
+  max_guests?: number | null;
+  maxGuests?: number | null;
   location?: string | null;
   avg_rating?: number | null;
   avgRating?: number | null;
@@ -33,6 +36,7 @@ export interface UpdateTourApprovalRequest {
   price: number;
   description?: string | null;
   duration_minutes: number;
+  max_guests?: number | null;
   location?: string | null;
   status: string;
   cancel_policy?: string | null;
@@ -49,6 +53,9 @@ const toUpdateRequest = (
   price: tour.price ?? 0,
   description: tour.description ?? '',
   duration_minutes: tour.duration_minutes ?? tour.durationMinutes ?? 0,
+  // Phải gửi lại, không thì PUT duyệt/từ chối ghi đè max_guests thành null và
+  // tour mất luôn giới hạn khách chủ thuyền đã khai.
+  max_guests: tour.max_guests ?? tour.maxGuests ?? null,
   location: tour.location ?? '',
   status,
   cancel_policy: tour.cancel_policy ?? tour.cancelPolicy ?? 'free',
